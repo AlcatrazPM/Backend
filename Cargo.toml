@@ -1,0 +1,9 @@
+[workspace]
+
+members = [
+    "appserver",     # main
+    "authenticator",
+    "accounts",
+    "database",
+    "userdata",
+]
