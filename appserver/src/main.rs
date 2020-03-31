@@ -12,5 +12,9 @@ fn main() {
     let dp = PrimaryDataProvider::new();
     let acct_ctrl = AccountsRestController::new(dp);
 
-    let _app = AppServer::new(auth, acct_ctrl);
+    let app = AppServer::new(auth, acct_ctrl);
+
+    app.start(8082).unwrap_or_else(|error| {
+        eprintln!("{:?}", error);
+    })
 }
