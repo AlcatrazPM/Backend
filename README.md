@@ -6,8 +6,8 @@ Link to [roadmap](https://www.dropbox.com/scl/fi/rsyh6p0wzddm9tpr9sc9b/AlcatrazP
 
 # Compile & Run
 
-Compilations made using the command `cargo build` in the root folder. The executable
-built in */target/appserver* (or *\target\appserver.exe* in Windows). It can be either
+Compilation is made using the command `cargo build` in the root folder. The executable
+is built in */target/appserver* (or *\target\appserver.exe* in Windows). It can be either
 run directly or by `cargo run`.
 The server will start and listen on port 8082 (need to change this) and any requests
 made to it will be printed to the console (for debugging).
@@ -66,6 +66,7 @@ modification, talk to the repo owner.
     ```
    POST /modifyaccount HTTP/1.1
    <any other fields>
+   
    {
        "Action": "add",
        "Site": {
