@@ -2,7 +2,10 @@ use accounts::accounts_provider::AccountsProvider;
 use authenticator::authenticator::Authenticator;
 use std::net::{TcpListener, TcpStream, SocketAddr, IpAddr, SocketAddrV4, Ipv4Addr};
 use std::io;
-use std::io::Read;
+use std::io::{Read, Write};
+
+// extern crate http;
+// use http::{Response, StatusCode};
 
 pub struct AppServer<Auth, Acct>
     where
@@ -82,6 +85,10 @@ where
 
         // TODO: parse request, choose controller to work and build & send response
 
+        // This is a mock response
+        let response = format!("HTTP/1.1 501 Not Implemented\r\n\r\n");
+        stream.write(response.as_bytes())?;
+        stream.flush().unwrap();
 
         Ok(())
     }
