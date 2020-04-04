@@ -27,7 +27,6 @@ pub struct Membership {
 
 /// Glob of information
 pub struct User {
-    pub username: String,
     pub email: String,
     pub membership: Membership,
     pub id: String,

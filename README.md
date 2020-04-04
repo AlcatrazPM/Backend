@@ -28,7 +28,11 @@ modification, talk to the repo owner.
     }
                
     ```
-    - Response will be: **TODO**
+    - Response will be:
+    ```
+    HTTP/1.1 200 OK
+    <any other fields>
+    ```
 
 2. Authenticate
     - Request will be: 
@@ -42,32 +46,48 @@ modification, talk to the repo owner.
     }
            
     ```
-   - Response will be: **TODO**
+   - Response will be:
+   ```
+   HTTP/1.1 200 OK
+   Content-Type: application/json
+   Content-Length: <body-length>
+   <any other fields>
+   
+   { "jwt": "<token>" }
+   ```
   
 2. Modify Master Password
     - Request will be: 
     ```
     POST /modifypassword HTTP/1.1
+    Authentication: Bearer <jwt_token>
     <any other fields>
     
     {
         "Username": "vlad_e_hispter@gmail.com",
-        "Password": "newpasswordhash"
+        "OldPassword": "notarealpasswordjustthehash",
+        "NewPassword": "newpasswordhash"
     }
            
     ```
-   - Response will be: **TODO**
+   - Response will be:
+   ```
+   HTTP/1.1 200 OK
+   <any other fields>
+   ```
 
 3. Get Accounts List
     - Request will be:
     ```
     POST /getaccounts HTTP/1.1
+    Authentication: Bearer <jwt_token>
     <any other fields>
-           
     ```
     - Response will be:
     ```
     HTTP/1.1 200 OK
+    Content-Type: application/json
+    Content-Length: <body-length>
     <any other fields>
     
     {
@@ -91,6 +111,7 @@ modification, talk to the repo owner.
     - Request will be: 
     ```
    POST /modifyaccount HTTP/1.1
+   Authentication: Bearer <jwt_token>
    <any other fields>
    
    {
@@ -119,7 +140,7 @@ modification, talk to the repo owner.
     HTTP/1.1 401 Unauthorized 
     <any other fields>
     ```
-    - Access Page Without Authentication
+    - Access Page Without Authentication / Wrong Old Password
     ```
     HTTP/1.1 403 Forbidden 
     <any other fields>
@@ -128,6 +149,10 @@ modification, talk to the repo owner.
    ```
    HTTP/1.1 404 Not Found
    <any other fields>
+   ```
+   - Unregistered User
+   ```
+   HTTP/1.1 499 Unregistered User
    ```
    - Rust backend panicked
    ```

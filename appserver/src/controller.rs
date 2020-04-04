@@ -1,24 +1,23 @@
 use accounts::accounts_provider::AccountsProvider;
-use authenticator::authenticator::Authenticator;
-use std::net::{TcpListener, TcpStream, SocketAddr, IpAddr, SocketAddrV4, Ipv4Addr};
+use authenticator::authenticator::{AuthCodes, Authenticator, AuthenticatorControl, Token};
 use std::io;
 use std::io::{Read, Write};
+use std::net::{IpAddr, Ipv4Addr, SocketAddr, SocketAddrV4, TcpListener, TcpStream};
 
-// extern crate http;
-// use http::{Response, StatusCode};
+use crate::utils::{get_request_type, Requests};
 
 pub struct AppServer<Auth, Acct>
-    where
-        Auth: Authenticator,
-        Acct: AccountsProvider,
+where
+    Auth: AuthenticatorControl,
+    Acct: AccountsProvider,
 {
     controller: MainRestController<Auth, Acct>,
 }
 
 impl<Auth, Acct> AppServer<Auth, Acct>
-    where
-        Auth: Authenticator,
-        Acct: AccountsProvider,
+where
+    Auth: AuthenticatorControl,
+    Acct: AccountsProvider,
 {
     /// Constructor
     pub fn new(auth: Auth, acct: Acct) -> AppServer<Auth, Acct> {
@@ -31,14 +30,11 @@ impl<Auth, Acct> AppServer<Auth, Acct>
     /// Binds on localhost:`port` and for every successive
     /// connection takes it to `MainRestController`
     pub fn start(&self, port: u16) -> io::Result<()> {
-        let addr = SocketAddr::new(
-            IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)),
-            port
-        );
+        let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), port);
         let listener = TcpListener::bind(&addr)?;
 
         for stream in listener.incoming() {
-            self.controller.handle_connection(stream?)?;
+            self.controller.handle_connection(stream?);
         }
 
         Ok(())
@@ -47,7 +43,7 @@ impl<Auth, Acct> AppServer<Auth, Acct>
 
 pub struct MainRestController<Auth, Acct>
 where
-    Auth: Authenticator,
+    Auth: AuthenticatorControl,
     Acct: AccountsProvider,
 {
     auth_controller: Auth,
@@ -56,7 +52,7 @@ where
 
 impl<Auth, Acct> MainRestController<Auth, Acct>
 where
-    Auth: Authenticator,
+    Auth: AuthenticatorControl,
     Acct: AccountsProvider,
 {
     /// Constructor
@@ -68,28 +64,41 @@ where
     }
 
     /// The main method of communicating with the Frontend for HTTP requests / responses
-    pub fn handle_connection(&self, mut stream: TcpStream) -> io::Result<()> {
+    pub fn handle_connection(&self, mut stream: TcpStream) {
         println!("Connection established.");
+        // This is a mock response, uncomment to skip all other code
+        // let response = format!("HTTP/1.1 501 Not Implemented\r\n\r\n");
+        // stream.write(response.as_bytes())?;
+        // stream.flush().unwrap();
 
         let mut buffer = [0; 512];
 
-        stream.read(&mut buffer)?;
+        stream.read(&mut buffer).unwrap();
 
         let buffer = String::from_utf8_lossy(&buffer[..]);
-
-        let request: Vec<&str> = buffer.split_terminator("\r\n").collect();
-
-        for line in request.iter() {
-            println!("{}", line);
-        }
+        let json = buffer.rsplit_terminator("\r\n\r\n").next().unwrap();
+        let end_json = json.rfind("}").unwrap();
+        let json = &json[..(end_json + 1)];
+        // println!("{}", json);
 
         // TODO: parse request, choose controller to work and build & send response
 
-        // This is a mock response
-        let response = format!("HTTP/1.1 501 Not Implemented\r\n\r\n");
-        stream.write(response.as_bytes())?;
-        stream.flush().unwrap();
+        let page = buffer.split_whitespace().nth(1).unwrap();
+        println!("{}", page);
 
-        Ok(())
+        let request: Requests = get_request_type(page);
+
+        let mut response: String = format!("HTTP/1.1 501 Not Implemented\r\n\r\n");
+        // Big if to branch to specific controller
+        if request == Requests::Register {
+            response = self.auth_controller.register_user_response(json);
+        } else if request == Requests::Authentication {
+            response = self.auth_controller.login_response(json);
+        } else if request == Requests::ModifyMasterPassword {
+            response = self.auth_controller.modify_pass_response(json);
+        }
+
+        stream.write(response.as_bytes()).unwrap();
+        stream.flush().unwrap();
     }
 }
