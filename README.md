@@ -18,28 +18,42 @@ modification, talk to the repo owner.
 
 1. Register
     - Request will be:
-     ```
-               POST /register HTTP/1.1
-               <any other fields>
+    ```
+    POST /register HTTP/1.1
+    <any other fields>
+   
+    {
+       "Username": "vlad_e_hispter@gmail.com",
+       "Password": "notarealpasswordjustthehash"
+    }
                
-               {
-                   "Username": "vlad_e_hispter@gmail.com",
-                   "Password": "notarealpasswordjustthehash"
-               }
-               
-     ```
+    ```
     - Response will be: **TODO**
 
 2. Authenticate
     - Request will be: 
     ```
-           POST /authenticate HTTP/1.1
-           <any other fields>
+    POST /authenticate HTTP/1.1
+    <any other fields>
+     
+    {
+       "Username": "vlad_e_hispter@gmail.com",
+       "Password": "notarealpasswordjustthehash"
+    }
            
-           {
-               "Username": "vlad_e_hispter@gmail.com",
-               "Password": "notarealpasswordjustthehash"
-           }
+    ```
+   - Response will be: **TODO**
+  
+2. Modify Master Password
+    - Request will be: 
+    ```
+    POST /modifypassword HTTP/1.1
+    <any other fields>
+    
+    {
+        "Username": "vlad_e_hispter@gmail.com",
+        "Password": "newpasswordhash"
+    }
            
     ```
    - Response will be: **TODO**
@@ -47,8 +61,8 @@ modification, talk to the repo owner.
 3. Get Accounts List
     - Request will be:
     ```
-           POST /getaccounts HTTP/1.1
-           <any other fields>
+    POST /getaccounts HTTP/1.1
+    <any other fields>
            
     ```
     - Response will be:
@@ -97,32 +111,32 @@ modification, talk to the repo owner.
 5. Error Responses
     - Incorrect JSON Format 
     ```
-        HTTP/1.1 400 Bad Request
-        <any other fields>
+    HTTP/1.1 400 Bad Request
+    <any other fields>
     ```
    - Bad Master Password
     ```
-        HTTP/1.1 401 Unauthorized 
-        <any other fields>
+    HTTP/1.1 401 Unauthorized 
+    <any other fields>
     ```
     - Access Page Without Authentication
     ```
-        HTTP/1.1 403 Forbidden 
-        <any other fields>
+    HTTP/1.1 403 Forbidden 
+    <any other fields>
     ```
    - Unknown request page
    ```
-       HTTP/1.1 404 Not Found
-       <any other fields>
+   HTTP/1.1 404 Not Found
+   <any other fields>
    ```
    - Rust backend panicked
    ```
-        HTTP/1.1 500 Internal Server Error
-        <any other fields>
+    HTTP/1.1 500 Internal Server Error
+    <any other fields>
    ```
     - Could not be bothered to implement yet
    ```
-       HTTP/1.1 501 Not Implemented
-       <any other fields>
+   HTTP/1.1 501 Not Implemented
+   <any other fields>
    ```
    
