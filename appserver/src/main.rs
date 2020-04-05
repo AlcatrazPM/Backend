@@ -1,9 +1,9 @@
 use crate::controller::AppServer;
-use crate::utils::*;
 use accounts::controller::AccountsRestController;
 use authenticator::controller::AuthRestController;
 use authenticator::gcp_auth::GcpAuthenticator;
 use database::primary_data_provider::PrimaryDataProvider;
+use accounts::acct_provider::AcctProvider;
 
 mod controller;
 mod utils;
@@ -12,8 +12,9 @@ fn main() {
     println!("Hello, world!");
     let dp = PrimaryDataProvider::new();
     let auth = GcpAuthenticator::new(&dp);
+    let acct = AcctProvider::new(&dp);
     let auth_ctrl = AuthRestController::new(auth);
-    let acct_ctrl = AccountsRestController::new(&dp);
+    let acct_ctrl = AccountsRestController::new(acct);
 
     let app = AppServer::new(auth_ctrl, acct_ctrl);
 

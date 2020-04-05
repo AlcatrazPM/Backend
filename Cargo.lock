@@ -5,6 +5,8 @@ name = "accounts"
 version = "0.1.0"
 dependencies = [
  "database 0.1.0",
+ "serde 1.0.106 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_json 1.0.50 (registry+https://github.com/rust-lang/crates.io-index)",
  "userdata 0.1.0",
 ]
 
@@ -160,6 +162,8 @@ name = "userdata"
 version = "0.1.0"
 dependencies = [
  "chrono 0.4.11 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde 1.0.106 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_json 1.0.50 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]

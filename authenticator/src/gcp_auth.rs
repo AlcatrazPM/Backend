@@ -2,10 +2,8 @@
 //!
 //! Implementation for GCP
 use crate::authenticator::*;
-use userdata::userinfo::User;
 // for logs
 use database::data_provider::DataProvider;
-use database::primary_data_provider::PrimaryDataProvider;
 
 pub struct GcpAuthenticator<'a, DP: DataProvider> {
     dataprovider: &'a DP,
@@ -52,7 +50,7 @@ where
         // mock response
         if user.password == "notarealpasswordjustthehash".to_string() {
             // voodoo magic password changed
-            self.dataprovider.save_logs("modified password".to_string());
+            self.dataprovider.save_logs(format!("modified password to {}", new_password));
             return AuthCodes::ChangedPassword;
         }
         // in case the old password was not correct

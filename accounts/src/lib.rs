@@ -14,3 +14,5 @@ mod tests {
 pub mod accounts_provider;
 /// User Account List REST Controller
 pub mod controller;
+
+pub mod acct_provider;

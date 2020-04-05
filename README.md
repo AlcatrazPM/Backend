@@ -115,7 +115,7 @@ modification, talk to the repo owner.
    <any other fields>
    
    {
-       "Action": "add",
+       "Operation": "add",
        "Site": {
            "Username": "vlad_e_hipster@gmail.com",
            "Password": "nohackerpls",

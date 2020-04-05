@@ -9,6 +9,7 @@ mod price {
         AUS,
     }
 
+    #[allow(dead_code)]
     pub struct Price {
         value: f32,
         currency: CurrencyType,

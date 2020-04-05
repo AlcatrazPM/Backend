@@ -6,8 +6,8 @@ use crate::authenticator::{
     AuthCodes, Authenticator, AuthenticatorControl, Token, UserCredentials,
 };
 // use serde_json::Value;
-use serde::{Deserialize, Serialize};
-use userdata::userinfo::User;
+use serde::{Deserialize};
+
 
 /// Authentication Controller
 pub struct AuthRestController<A: Authenticator> {
@@ -27,16 +27,23 @@ impl<A> AuthenticatorControl for AuthRestController<A>
 where
     A: Authenticator,
 {
-    fn login_response(&self, json: &str) -> String {
-        let credentials: UserCredentials = serde_json::from_str(json).unwrap();
+    fn login_response(&self, json: Option<&str>) -> String {
+        let mut response: String = format!("HTTP/1.1 400 Bad Request\r\n\r\n");
+        if json.is_none() {
+            return response;
+        }
+        let json = json.unwrap();
+        let credentials = serde_json::from_str(json);
+        if credentials.is_err() {
+            return response;
+        }
+        let credentials = credentials.unwrap();
         println!("~{:?}", credentials);
         let (token, ret_code): (Token, AuthCodes) = self.auth.login(credentials);
 
         let mut response_json = String::from("{ \"jwt\": \"");
         response_json.push_str(token.as_str());
         response_json.push_str("\" }");
-
-        let mut response: String = format!("HTTP/1.1 501 Not Implemented\r\n\r\n");
 
         if ret_code == AuthCodes::LoginOk {
             response = format!(
@@ -59,12 +66,19 @@ where
         response
     }
 
-    fn register_user_response(&self, json: &str) -> String {
-        let credentials: UserCredentials = serde_json::from_str(json).unwrap();
+    fn register_user_response(&self, json: Option<&str>) -> String {
+        let mut response: String = format!("HTTP/1.1 400 Bad Request\r\n\r\n");
+        if json.is_none() {
+            return response;
+        }
+        let json = json.unwrap();
+        let credentials = serde_json::from_str(json);
+        if credentials.is_err() {
+            return response;
+        }
+        let credentials = credentials.unwrap();
         println!("~{:?}", credentials);
         let ret_code: AuthCodes = self.auth.register(credentials);
-
-        let mut response: String = format!("HTTP/1.1 501 Not Implemented\r\n\r\n");
 
         if ret_code == AuthCodes::RegisterOk {
             response = format!("HTTP/1.1 200 OK\r\n\r\n");
@@ -79,8 +93,17 @@ where
         response
     }
 
-    fn modify_pass_response(&self, json: &str) -> String {
-        let json_data: ModifyPasswordJSON = serde_json::from_str(json).unwrap();
+    fn modify_pass_response(&self, json: Option<&str>) -> String {
+        let mut response: String = format!("HTTP/1.1 400 Bad Request\r\n\r\n");
+        if json.is_none() {
+            return response;
+        }
+        let json = json.unwrap();
+        let json_data = serde_json::from_str(json);
+        if json_data.is_err() {
+            return response;
+        }
+        let json_data: ModifyPasswordJSON = json_data.unwrap();
         println!("~~{:?}", json_data);
 
         let credentials: UserCredentials = UserCredentials {
@@ -92,7 +115,6 @@ where
             .auth
             .modify_password(credentials, json_data.new_password);
 
-        let mut response: String = format!("HTTP/1.1 501 Not Implemented\r\n\r\n");
 
         if ret_code == AuthCodes::ChangedPassword {
             response = format!("HTTP/1.1 200 OK\r\n\r\n");

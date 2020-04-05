@@ -18,9 +18,11 @@ impl DataProvider for PrimaryDataProvider {
     fn add_site_account(&self, user_id: String, site: SiteAccount) -> DatabaseCodes {
         DatabaseCodes::NotImplemented
     }
+
     fn remove_site_account(&self, user_id: String, site: SiteAccount) -> DatabaseCodes {
         DatabaseCodes::NotImplemented
     }
+
     fn get_all_site_accounts(&self, ) -> Result<Vec<SiteAccount>, DatabaseCodes> {
         Err(DatabaseCodes::NotImplemented)
     }

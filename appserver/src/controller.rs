@@ -1,15 +1,15 @@
-use accounts::accounts_provider::AccountsProvider;
-use authenticator::authenticator::{AuthCodes, Authenticator, AuthenticatorControl, Token};
+use accounts::accounts_provider::{AccountsControl};
+use authenticator::authenticator::{AuthenticatorControl};
 use std::io;
 use std::io::{Read, Write};
-use std::net::{IpAddr, Ipv4Addr, SocketAddr, SocketAddrV4, TcpListener, TcpStream};
+use std::net::{IpAddr, Ipv4Addr, SocketAddr, TcpListener, TcpStream};
 
-use crate::utils::{get_request_type, Requests};
+use crate::utils::{get_request_type, Requests, authorise};
 
 pub struct AppServer<Auth, Acct>
 where
     Auth: AuthenticatorControl,
-    Acct: AccountsProvider,
+    Acct: AccountsControl,
 {
     controller: MainRestController<Auth, Acct>,
 }
@@ -17,7 +17,7 @@ where
 impl<Auth, Acct> AppServer<Auth, Acct>
 where
     Auth: AuthenticatorControl,
-    Acct: AccountsProvider,
+    Acct: AccountsControl,
 {
     /// Constructor
     pub fn new(auth: Auth, acct: Acct) -> AppServer<Auth, Acct> {
@@ -44,7 +44,7 @@ where
 pub struct MainRestController<Auth, Acct>
 where
     Auth: AuthenticatorControl,
-    Acct: AccountsProvider,
+    Acct: AccountsControl,
 {
     auth_controller: Auth,
     accounts_controller: Acct,
@@ -53,7 +53,7 @@ where
 impl<Auth, Acct> MainRestController<Auth, Acct>
 where
     Auth: AuthenticatorControl,
-    Acct: AccountsProvider,
+    Acct: AccountsControl,
 {
     /// Constructor
     pub fn new(auth: Auth, acct: Acct) -> MainRestController<Auth, Acct> {
@@ -72,30 +72,75 @@ where
         // stream.flush().unwrap();
 
         let mut buffer = [0; 512];
+        let implicit_response: String = format!("HTTP/1.1 500 Internal Server Error\r\n\r\n");
 
-        stream.read(&mut buffer).unwrap();
+        let mut response = implicit_response.clone();
+
+        let ret = stream.read(&mut buffer);
+        if ret.is_err() {
+            stream.write(implicit_response.as_bytes()).unwrap();
+            stream.flush().unwrap();
+            return;
+        }
 
         let buffer = String::from_utf8_lossy(&buffer[..]);
-        let json = buffer.rsplit_terminator("\r\n\r\n").next().unwrap();
-        let end_json = json.rfind("}").unwrap();
-        let json = &json[..(end_json + 1)];
-        // println!("{}", json);
+        let buffer = String::from(buffer);
+        let json = buffer.rsplit_terminator("\r\n\r\n").next();
+        if json.is_none() {
+            stream.write(implicit_response.as_bytes()).unwrap();
+            stream.flush().unwrap();
+            return;
+        }
+        let json = json.unwrap();
 
-        // TODO: parse request, choose controller to work and build & send response
+        let end_json = json.rfind("}");
+        let json: Option<&str> = match end_json {
+            Some(idx) => Some(&json[..(idx + 1)]),
+            None => None,
+        };
 
         let page = buffer.split_whitespace().nth(1).unwrap();
         println!("{}", page);
 
         let request: Requests = get_request_type(page);
 
-        let mut response: String = format!("HTTP/1.1 501 Not Implemented\r\n\r\n");
+        // TODO: ADD AUTHENTICATION CHECK, like NOW
+
         // Big if to branch to specific controller
         if request == Requests::Register {
             response = self.auth_controller.register_user_response(json);
         } else if request == Requests::Authentication {
             response = self.auth_controller.login_response(json);
         } else if request == Requests::ModifyMasterPassword {
+            let jwt = authorise(&buffer);
+            if jwt.is_none() {
+                response = format!("HTTP/1.1 403 Forbidden\r\n\r\n");
+                stream.write(response.as_bytes()).unwrap();
+                stream.flush().unwrap();
+                return;
+            }
             response = self.auth_controller.modify_pass_response(json);
+        } else if request == Requests::ModifyAccount {
+            let jwt = authorise(&buffer);
+            if jwt.is_none() {
+                response = format!("HTTP/1.1 403 Forbidden\r\n\r\n");
+                stream.write(response.as_bytes()).unwrap();
+                stream.flush().unwrap();
+                return;
+            }
+            let jwt = jwt.unwrap();
+            response = self.accounts_controller.modify_site_account_response(json, jwt);
+            // response = self.auth_controller.modify_pass_response(json);
+        } else if request == Requests::AccountsList {
+            let jwt = authorise(&buffer);
+            if jwt.is_none() {
+                response = format!("HTTP/1.1 403 Forbidden\r\n\r\n");
+                stream.write(response.as_bytes()).unwrap();
+                stream.flush().unwrap();
+                return;
+            }
+            let jwt = jwt.unwrap();
+            response = self.accounts_controller.get_all_site_accounts_response(jwt);
         }
 
         stream.write(response.as_bytes()).unwrap();
