@@ -15,19 +15,20 @@ impl PrimaryDataProvider {
 }
 
 impl DataProvider for PrimaryDataProvider {
-    fn add_site_account(user_id: String, site: SiteAccount) -> DatabaseCodes {
+    fn add_site_account(&self, user_id: String, site: SiteAccount) -> DatabaseCodes {
         DatabaseCodes::NotImplemented
     }
-    fn remove_site_account(user_id: String, site: SiteAccount) -> DatabaseCodes {
+    fn remove_site_account(&self, user_id: String, site: SiteAccount) -> DatabaseCodes {
         DatabaseCodes::NotImplemented
     }
-    fn get_all_site_accounts() -> Result<Vec<SiteAccount>, DatabaseCodes> {
+    fn get_all_site_accounts(&self, ) -> Result<Vec<SiteAccount>, DatabaseCodes> {
         Err(DatabaseCodes::NotImplemented)
     }
-    fn save_user_membership(user_id: String, membership: Membership) -> DatabaseCodes {
+    fn save_user_membership(&self, user_id: String, membership: Membership) -> DatabaseCodes {
         DatabaseCodes::NotImplemented
     }
-    fn save_logs(log: String) -> bool {
+    fn save_logs(&self, log: String) -> bool {
+        println!("This is a log: {}", log);
         false
     }
 }

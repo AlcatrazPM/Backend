@@ -7,15 +7,25 @@ use userdata::userinfo::User;
 use database::data_provider::DataProvider;
 use database::primary_data_provider::PrimaryDataProvider;
 
-pub struct GcpAuthenticator;
+pub struct GcpAuthenticator<'a, DP: DataProvider> {
+    dataprovider: &'a DP,
+}
 
-impl GcpAuthenticator {
-    pub fn new() -> GcpAuthenticator {
-        GcpAuthenticator
+impl<DP> GcpAuthenticator<'_, DP>
+where
+    DP: DataProvider,
+{
+    pub fn new(dataprovider: &DP) -> GcpAuthenticator<DP> {
+        GcpAuthenticator {
+            dataprovider,
+        }
     }
 }
 
-impl Authenticator for GcpAuthenticator {
+impl<DP> Authenticator for GcpAuthenticator<'_, DP>
+where
+    DP: DataProvider,
+{
     fn login(&self, user: UserCredentials) -> (Token, AuthCodes) {
         // mock response
         if user.username == "vlad_e_hispter@gmail.com".to_string() {
@@ -42,9 +52,11 @@ impl Authenticator for GcpAuthenticator {
         // mock response
         if user.password == "notarealpasswordjustthehash".to_string() {
             // voodoo magic password changed
+            self.dataprovider.save_logs("modified password".to_string());
             return AuthCodes::ChangedPassword;
         }
         // in case the old password was not correct
+        self.dataprovider.save_logs("wrong old password".to_string());
         AuthCodes::BadPassword
         // end mock response
     }

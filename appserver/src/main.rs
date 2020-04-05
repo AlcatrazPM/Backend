@@ -10,10 +10,10 @@ mod utils;
 
 fn main() {
     println!("Hello, world!");
-    let auth = GcpAuthenticator::new();
-    let auth_ctrl = AuthRestController::new(auth);
     let dp = PrimaryDataProvider::new();
-    let acct_ctrl = AccountsRestController::new(dp);
+    let auth = GcpAuthenticator::new(&dp);
+    let auth_ctrl = AuthRestController::new(auth);
+    let acct_ctrl = AccountsRestController::new(&dp);
 
     let app = AppServer::new(auth_ctrl, acct_ctrl);
 

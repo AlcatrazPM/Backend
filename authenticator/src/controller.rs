@@ -80,7 +80,6 @@ where
     }
 
     fn modify_pass_response(&self, json: &str) -> String {
-        println!("{:?}", json);
         let json_data: ModifyPasswordJSON = serde_json::from_str(json).unwrap();
         println!("~~{:?}", json_data);
 

@@ -6,20 +6,20 @@ use crate::accounts_provider::{AccountsCodes, AccountsProvider};
 use database::data_provider::DataProvider;
 use userdata::siteinfo::SiteAccount;
 
-pub struct AccountsRestController<DP: DataProvider> {
-    dataprovider: DP,
+pub struct AccountsRestController<'a, DP: DataProvider> {
+    dataprovider: &'a DP,
 }
 
-impl<DP> AccountsRestController<DP>
+impl<DP> AccountsRestController<'_, DP>
 where
     DP: DataProvider,
 {
-    pub fn new(dp: DP) -> AccountsRestController<DP> {
-        AccountsRestController { dataprovider: dp }
+    pub fn new<'a>(dataprovider: &'a DP) -> AccountsRestController<DP> {
+        AccountsRestController { dataprovider }
     }
 }
 
-impl<DP> AccountsProvider for AccountsRestController<DP>
+impl<DP> AccountsProvider for AccountsRestController<'_, DP>
 where
     DP: DataProvider,
 {
