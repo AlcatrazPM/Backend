@@ -1,9 +1,9 @@
 use crate::controller::AppServer;
+use accounts::acct_provider::AcctProvider;
 use accounts::controller::AccountsRestController;
 use authenticator::controller::AuthRestController;
 use authenticator::gcp_auth::GcpAuthenticator;
 use database::primary_data_provider::PrimaryDataProvider;
-use accounts::acct_provider::AcctProvider;
 
 mod controller;
 mod utils;

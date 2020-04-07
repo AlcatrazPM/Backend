@@ -1,10 +1,10 @@
-use accounts::accounts_provider::{AccountsControl};
-use authenticator::authenticator::{AuthenticatorControl};
+use accounts::accounts_provider::AccountsControl;
+use authenticator::authenticator::AuthenticatorControl;
 use std::io;
 use std::io::{Read, Write};
 use std::net::{IpAddr, Ipv4Addr, SocketAddr, TcpListener, TcpStream};
 
-use crate::utils::{get_request_type, Requests, authorise};
+use crate::utils::{authorise, get_request_type, Requests};
 use http::response::Response;
 use http::statuscode::StatsCodes;
 
@@ -74,78 +74,85 @@ where
         // stream.flush().unwrap();
 
         let mut buffer = [0; 512];
-        // let implicit_response: String = format!("HTTP/1.1 500 Internal Server Error\r\n\r\n");
         let implicit_response = Response::build().status(StatsCodes::InternalError);
-        let mut response = Response::build();
 
-        let ret = stream.read(&mut buffer);
-        if ret.is_err() {
-            stream.write(implicit_response.to_string().as_bytes()).unwrap();
-            stream.flush().unwrap();
+        if stream.read(&mut buffer).is_err() {
+            self.write_stream(stream, implicit_response);
             return;
         }
 
-        let buffer = String::from_utf8_lossy(&buffer[..]);
-        let buffer = String::from(buffer);
-        let json = buffer.rsplit_terminator("\r\n\r\n").next();
-        if json.is_none() {
-            stream.write(implicit_response.to_string().as_bytes()).unwrap();
-            stream.flush().unwrap();
-            return;
-        }
-        let json = json.unwrap();
+        // don't @me for this
+        let buffer = String::from(String::from_utf8_lossy(&buffer[..]));
 
-        let end_json = json.rfind("}");
+        let body: &str = match buffer.rsplit_terminator("\r\n\r\n").next() {
+            Some(data) => data,
+            None => {
+                self.write_stream(stream, Response::build().status(StatsCodes::BadRequest));
+                return;
+            }
+        };
+
+        let end_json = body.rfind("}");
         let json: Option<&str> = match end_json {
-            Some(idx) => Some(&json[..(idx + 1)]),
+            Some(idx) => Some(&body[..(idx + 1)]),
             None => None,
         };
 
         let page = buffer.split_whitespace().nth(1).unwrap();
         println!("{}", page);
 
+        let jwt = authorise(&buffer);
         let request: Requests = get_request_type(page);
 
-        // Big if to branch to specific controller
-        if request == Requests::Register {
-            response = self.auth_controller.register_user_response(json);
-        } else if request == Requests::Authentication {
-            response = self.auth_controller.login_response(json);
-        } else if request == Requests::ModifyMasterPassword {
-            let jwt = authorise(&buffer);
-            if jwt.is_none() {
-                // response = format!("HTTP/1.1 403 Forbidden\r\n\r\n");
-                response = response.status(StatsCodes::Forbidden);
-                stream.write(response.to_string().as_bytes()).unwrap();
-                stream.flush().unwrap();
+        let response: Response = match request {
+            Requests::Register => self.auth_controller.register_user_response(json),
+            Requests::Authentication => self.auth_controller.login_response(json),
+            Requests::ModifyMasterPassword => {
+                if jwt.is_none() {
+                    self.write_stream(stream, Response::build().status(StatsCodes::Forbidden));
+                    return;
+                }
+                self.auth_controller.modify_pass_response(json)
+            }
+            Requests::AccountsList => {
+                if jwt.is_none() {
+                    self.write_stream(stream, Response::build().status(StatsCodes::Forbidden));
+                    return;
+                }
+                self.accounts_controller
+                    .get_all_site_accounts_response(jwt.unwrap())
+            }
+            Requests::ModifyAccount => {
+                if jwt.is_none() {
+                    self.write_stream(stream, Response::build().status(StatsCodes::Forbidden));
+                    return;
+                }
+                self.accounts_controller
+                    .modify_site_account_response(json, jwt.unwrap())
+            }
+            Requests::BadRequest => {
+                self.write_stream(stream, Response::build().status(StatsCodes::Forbidden));
                 return;
             }
-            response = self.auth_controller.modify_pass_response(json);
-        } else if request == Requests::ModifyAccount {
-            let jwt = authorise(&buffer);
-            if jwt.is_none() {
-                // response = format!("HTTP/1.1 403 Forbidden\r\n\r\n");
-                response = response.status(StatsCodes::Forbidden);
-                stream.write(response.to_string().as_bytes()).unwrap();
-                stream.flush().unwrap();
+            Requests::NotImplemented => {
+                self.write_stream(stream, Response::build().status(StatsCodes::Forbidden));
                 return;
             }
-            let jwt = jwt.unwrap();
-            response = self.accounts_controller.modify_site_account_response(json, jwt);
-        } else if request == Requests::AccountsList {
-            let jwt = authorise(&buffer);
-            if jwt.is_none() {
-                // response = format!("HTTP/1.1 403 Forbidden\r\n\r\n");
-                response = response.status(StatsCodes::Forbidden);
-                stream.write(response.to_string().as_bytes()).unwrap();
-                stream.flush().unwrap();
-                return;
-            }
-            let jwt = jwt.unwrap();
-            response = self.accounts_controller.get_all_site_accounts_response(jwt);
-        }
+        };
 
-        stream.write(response.to_string().as_bytes()).unwrap();
-        stream.flush().unwrap();
+        self.write_stream(stream, response);
+    }
+
+    fn write_stream(&self, mut stream: TcpStream, response: Response) {
+        if let Err(_) = stream.write(response.to_string().as_bytes()) {
+            if let Err(_) = stream.write(response.to_string().as_bytes()) {
+                return;
+            }
+        }
+        if let Err(_) = stream.flush() {
+            if let Err(_) = stream.flush() {
+                return;
+            }
+        }
     }
 }

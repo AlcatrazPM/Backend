@@ -1,10 +1,10 @@
-pub mod statuscode;
 pub mod response;
+pub mod statuscode;
 
 #[cfg(test)]
 mod tests {
-    use crate::statuscode::StatsCodes;
     use crate::response::Response;
+    use crate::statuscode::StatsCodes;
 
     #[test]
     fn it_works() {
@@ -27,8 +27,9 @@ mod tests {
             .body("ABCDEF".to_string());
 
         let response = response.to_string();
-        let reference = String::from("HTTP/1.1 200 OK\r\nContent-Type: html/text\r\nContent-Length: 10\r\n\r\nABCDEF\r\n");
+        let reference = String::from(
+            "HTTP/1.1 200 OK\r\nContent-Type: html/text\r\nContent-Length: 10\r\n\r\nABCDEF\r\n",
+        );
         assert_eq!(response, reference);
     }
 }
-

@@ -23,7 +23,7 @@ impl DataProvider for PrimaryDataProvider {
         DatabaseCodes::NotImplemented
     }
 
-    fn get_all_site_accounts(&self, ) -> Result<Vec<SiteAccount>, DatabaseCodes> {
+    fn get_all_site_accounts(&self) -> Result<Vec<SiteAccount>, DatabaseCodes> {
         Err(DatabaseCodes::NotImplemented)
     }
     fn save_user_membership(&self, user_id: String, membership: Membership) -> DatabaseCodes {

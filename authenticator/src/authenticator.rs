@@ -2,8 +2,8 @@
 //!
 //! Describes the trait.
 
-use serde::{Deserialize};
 use http::response::Response;
+use serde::Deserialize;
 
 /// Return codes for various functions
 #[derive(PartialEq)]

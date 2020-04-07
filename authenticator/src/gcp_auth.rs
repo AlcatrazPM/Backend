@@ -14,9 +14,7 @@ where
     DP: DataProvider,
 {
     pub fn new(dataprovider: &DP) -> GcpAuthenticator<DP> {
-        GcpAuthenticator {
-            dataprovider,
-        }
+        GcpAuthenticator { dataprovider }
     }
 }
 
@@ -50,11 +48,13 @@ where
         // mock response
         if user.password == "notarealpasswordjustthehash".to_string() {
             // voodoo magic password changed
-            self.dataprovider.save_logs(format!("modified password to {}", new_password));
+            self.dataprovider
+                .save_logs(format!("modified password to {}", new_password));
             return AuthCodes::ChangedPassword;
         }
         // in case the old password was not correct
-        self.dataprovider.save_logs("wrong old password".to_string());
+        self.dataprovider
+            .save_logs("wrong old password".to_string());
         AuthCodes::BadPassword
         // end mock response
     }

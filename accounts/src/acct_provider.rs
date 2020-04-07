@@ -1,19 +1,17 @@
-use crate::accounts_provider::{AccountsProvider, AccountsCodes};
-use userdata::siteinfo::SiteAccount;
+use crate::accounts_provider::{AccountsCodes, AccountsProvider};
 use database::data_provider::DataProvider;
+use userdata::siteinfo::SiteAccount;
 
 pub struct AcctProvider<'a, DP: DataProvider> {
-    dataprovider: &'a DP
+    dataprovider: &'a DP,
 }
 
 impl<DP> AcctProvider<'_, DP>
-where
-    DP: DataProvider
+    where
+        DP: DataProvider,
 {
     pub fn new(dataprovider: &DP) -> AcctProvider<DP> {
-        AcctProvider {
-            dataprovider,
-        }
+        AcctProvider { dataprovider }
     }
 }
 
