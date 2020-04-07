@@ -7,6 +7,8 @@ use crate::authenticator::{
 };
 // use serde_json::Value;
 use serde::{Deserialize};
+use http::response::Response;
+use http::statuscode::StatsCodes;
 
 
 /// Authentication Controller
@@ -15,8 +17,8 @@ pub struct AuthRestController<A: Authenticator> {
 }
 
 impl<A> AuthRestController<A>
-where
-    A: Authenticator,
+    where
+        A: Authenticator,
 {
     pub fn new(auth: A) -> AuthRestController<A> {
         AuthRestController { auth }
@@ -27,8 +29,9 @@ impl<A> AuthenticatorControl for AuthRestController<A>
 where
     A: Authenticator,
 {
-    fn login_response(&self, json: Option<&str>) -> String {
-        let mut response: String = format!("HTTP/1.1 400 Bad Request\r\n\r\n");
+    fn login_response(&self, json: Option<&str>) -> Response {
+        // let mut response: String = format!("HTTP/1.1 400 Bad Request\r\n\r\n");
+        let mut response = Response::build().status(StatsCodes::BadRequest);
         if json.is_none() {
             return response;
         }
@@ -46,28 +49,39 @@ where
         response_json.push_str("\" }");
 
         if ret_code == AuthCodes::LoginOk {
-            response = format!(
-                "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\n\r\n{}",
-                response_json.len(),
-                response_json
-            );
+            // response = format!(
+            //     "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\n\r\n{}",
+            //     response_json.len(),
+            //     response_json
+            // );
+            let ctype = "application/json".to_string();
+            let clength = response_json.len();
+            response = response.status(StatsCodes::OK)
+                .content(ctype, clength as u32)
+                .body(response_json);
         } else if ret_code == AuthCodes::DatabaseError {
-            response = format!("HTTP/1.1 500 Internal Server Error\r\n\r\n");
+            // response = format!("HTTP/1.1 500 Internal Server Error\r\n\r\n");
+            response = response.status(StatsCodes::InternalError);
         } else if ret_code == AuthCodes::InternalError {
-            response = format!("HTTP/1.1 500 Internal Server Error\r\n\r\n");
+            // response = format!("HTTP/1.1 500 Internal Server Error\r\n\r\n");
+            response = response.status(StatsCodes::InternalError);
         } else if ret_code == AuthCodes::BadPassword {
-            response = format!("HTTP/1.1 401 Unauthorized\r\n\r\n");
+            // response = format!("HTTP/1.1 401 Unauthorized\r\n\r\n");
+            response = response.status(StatsCodes::Unauthorized);
         } else if ret_code == AuthCodes::UnregisteredUser {
-            response = format!("HTTP/1.1 499 Unregistered User\r\n\r\n");
+            // response = format!("HTTP/1.1 499 Unregistered User\r\n\r\n");
+            response = response.status(StatsCodes::UnregisteredUser);
         } else if ret_code == AuthCodes::NotImplemented {
-            response = format!("HTTP/1.1 501 Not Implemented\r\n\r\n");
+            // response = format!("HTTP/1.1 501 Not Implemented\r\n\r\n");
+            response = response.status(StatsCodes::NotImplemented);
         }
 
         response
     }
 
-    fn register_user_response(&self, json: Option<&str>) -> String {
-        let mut response: String = format!("HTTP/1.1 400 Bad Request\r\n\r\n");
+    fn register_user_response(&self, json: Option<&str>) -> Response {
+        // let mut response: String = format!("HTTP/1.1 400 Bad Request\r\n\r\n");
+        let mut response = Response::build().status(StatsCodes::BadRequest);
         if json.is_none() {
             return response;
         }
@@ -81,20 +95,25 @@ where
         let ret_code: AuthCodes = self.auth.register(credentials);
 
         if ret_code == AuthCodes::RegisterOk {
-            response = format!("HTTP/1.1 200 OK\r\n\r\n");
+            // response = format!("HTTP/1.1 200 OK\r\n\r\n");
+            response = response.status(StatsCodes::OK);
         } else if ret_code == AuthCodes::DatabaseError {
-            response = format!("HTTP/1.1 500 Internal Server Error\r\n\r\n");
+            // response = format!("HTTP/1.1 500 Internal Server Error\r\n\r\n");
+            response = response.status(StatsCodes::InternalError);
         } else if ret_code == AuthCodes::InternalError {
-            response = format!("HTTP/1.1 500 Internal Server Error\r\n\r\n");
+            // response = format!("HTTP/1.1 500 Internal Server Error\r\n\r\n");
+            response = response.status(StatsCodes::InternalError);
         } else if ret_code == AuthCodes::NotImplemented {
-            response = format!("HTTP/1.1 501 Not Implemented\r\n\r\n");
+            // response = format!("HTTP/1.1 501 Not Implemented\r\n\r\n");
+            response = response.status(StatsCodes::InternalError);
         }
 
         response
     }
 
-    fn modify_pass_response(&self, json: Option<&str>) -> String {
-        let mut response: String = format!("HTTP/1.1 400 Bad Request\r\n\r\n");
+    fn modify_pass_response(&self, json: Option<&str>) -> Response {
+        // let mut response: String = format!("HTTP/1.1 400 Bad Request\r\n\r\n");
+        let mut response = Response::build().status(StatsCodes::BadRequest);
         if json.is_none() {
             return response;
         }
@@ -117,15 +136,20 @@ where
 
 
         if ret_code == AuthCodes::ChangedPassword {
-            response = format!("HTTP/1.1 200 OK\r\n\r\n");
+            // response = format!("HTTP/1.1 200 OK\r\n\r\n");
+            response = response.status(StatsCodes::OK);
         } else if ret_code == AuthCodes::DatabaseError {
-            response = format!("HTTP/1.1 500 Internal Server Error\r\n\r\n");
+            // response = format!("HTTP/1.1 500 Internal Server Error\r\n\r\n");
+            response = response.status(StatsCodes::InternalError);
         } else if ret_code == AuthCodes::InternalError {
-            response = format!("HTTP/1.1 500 Internal Server Error\r\n\r\n");
+            // response = format!("HTTP/1.1 500 Internal Server Error\r\n\r\n");
+            response = response.status(StatsCodes::InternalError);
         } else if ret_code == AuthCodes::BadPassword {
-            response = format!("HTTP/1.1 403 Forbidden\r\n\r\n");
+            // response = format!("HTTP/1.1 403 Forbidden\r\n\r\n");
+            response = response.status(StatsCodes::Forbidden);
         } else if ret_code == AuthCodes::NotImplemented {
-            response = format!("HTTP/1.1 501 Not Implemented\r\n\r\n");
+            // response = format!("HTTP/1.1 501 Not Implemented\r\n\r\n");
+            response = response.status(StatsCodes::NotImplemented);
         }
 
         response

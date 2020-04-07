@@ -5,11 +5,13 @@ use std::io::{Read, Write};
 use std::net::{IpAddr, Ipv4Addr, SocketAddr, TcpListener, TcpStream};
 
 use crate::utils::{get_request_type, Requests, authorise};
+use http::response::Response;
+use http::statuscode::StatsCodes;
 
 pub struct AppServer<Auth, Acct>
-where
-    Auth: AuthenticatorControl,
-    Acct: AccountsControl,
+    where
+        Auth: AuthenticatorControl,
+        Acct: AccountsControl,
 {
     controller: MainRestController<Auth, Acct>,
 }
@@ -72,13 +74,13 @@ where
         // stream.flush().unwrap();
 
         let mut buffer = [0; 512];
-        let implicit_response: String = format!("HTTP/1.1 500 Internal Server Error\r\n\r\n");
-
-        let mut response = implicit_response.clone();
+        // let implicit_response: String = format!("HTTP/1.1 500 Internal Server Error\r\n\r\n");
+        let implicit_response = Response::build().status(StatsCodes::InternalError);
+        let mut response = Response::build();
 
         let ret = stream.read(&mut buffer);
         if ret.is_err() {
-            stream.write(implicit_response.as_bytes()).unwrap();
+            stream.write(implicit_response.to_string().as_bytes()).unwrap();
             stream.flush().unwrap();
             return;
         }
@@ -87,7 +89,7 @@ where
         let buffer = String::from(buffer);
         let json = buffer.rsplit_terminator("\r\n\r\n").next();
         if json.is_none() {
-            stream.write(implicit_response.as_bytes()).unwrap();
+            stream.write(implicit_response.to_string().as_bytes()).unwrap();
             stream.flush().unwrap();
             return;
         }
@@ -104,8 +106,6 @@ where
 
         let request: Requests = get_request_type(page);
 
-        // TODO: ADD AUTHENTICATION CHECK, like NOW
-
         // Big if to branch to specific controller
         if request == Requests::Register {
             response = self.auth_controller.register_user_response(json);
@@ -114,8 +114,9 @@ where
         } else if request == Requests::ModifyMasterPassword {
             let jwt = authorise(&buffer);
             if jwt.is_none() {
-                response = format!("HTTP/1.1 403 Forbidden\r\n\r\n");
-                stream.write(response.as_bytes()).unwrap();
+                // response = format!("HTTP/1.1 403 Forbidden\r\n\r\n");
+                response = response.status(StatsCodes::Forbidden);
+                stream.write(response.to_string().as_bytes()).unwrap();
                 stream.flush().unwrap();
                 return;
             }
@@ -123,19 +124,20 @@ where
         } else if request == Requests::ModifyAccount {
             let jwt = authorise(&buffer);
             if jwt.is_none() {
-                response = format!("HTTP/1.1 403 Forbidden\r\n\r\n");
-                stream.write(response.as_bytes()).unwrap();
+                // response = format!("HTTP/1.1 403 Forbidden\r\n\r\n");
+                response = response.status(StatsCodes::Forbidden);
+                stream.write(response.to_string().as_bytes()).unwrap();
                 stream.flush().unwrap();
                 return;
             }
             let jwt = jwt.unwrap();
             response = self.accounts_controller.modify_site_account_response(json, jwt);
-            // response = self.auth_controller.modify_pass_response(json);
         } else if request == Requests::AccountsList {
             let jwt = authorise(&buffer);
             if jwt.is_none() {
-                response = format!("HTTP/1.1 403 Forbidden\r\n\r\n");
-                stream.write(response.as_bytes()).unwrap();
+                // response = format!("HTTP/1.1 403 Forbidden\r\n\r\n");
+                response = response.status(StatsCodes::Forbidden);
+                stream.write(response.to_string().as_bytes()).unwrap();
                 stream.flush().unwrap();
                 return;
             }
@@ -143,7 +145,7 @@ where
             response = self.accounts_controller.get_all_site_accounts_response(jwt);
         }
 
-        stream.write(response.as_bytes()).unwrap();
+        stream.write(response.to_string().as_bytes()).unwrap();
         stream.flush().unwrap();
     }
 }

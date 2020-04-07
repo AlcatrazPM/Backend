@@ -55,22 +55,22 @@ impl ToString for Response {
         if let Some(ctype) = &self.content_type {
             response.push_str("Content-Type: ");
             response.push_str(ctype.as_str());
+            response.push_str(END_LINE);
         }
-        response.push_str(END_LINE);
 
         if let Some(clength) = &self.content_length {
             let length = format!("{}", clength);
             response.push_str("Content-Length: ");
             response.push_str(length.as_str());
+            response.push_str(END_LINE);
         }
-        response.push_str(END_LINE);
 
         // body
         response.push_str(END_LINE);
         if let Some(body) = &self.body {
             response.push_str(body.as_str());
+            response.push_str(END_LINE);
         }
-        response.push_str(END_LINE);
 
         response
     }

@@ -3,6 +3,7 @@
 //! Describes the trait.
 
 use serde::{Deserialize};
+use http::response::Response;
 
 /// Return codes for various functions
 #[derive(PartialEq)]
@@ -37,7 +38,7 @@ pub trait Authenticator {
 
 /// Methods any controller needs to implement
 pub trait AuthenticatorControl {
-    fn login_response(&self, json: Option<&str>) -> String;
-    fn register_user_response(&self, json: Option<&str>) -> String;
-    fn modify_pass_response(&self, json: Option<&str>) -> String;
+    fn login_response(&self, json: Option<&str>) -> Response;
+    fn register_user_response(&self, json: Option<&str>) -> Response;
+    fn modify_pass_response(&self, json: Option<&str>) -> Response;
 }

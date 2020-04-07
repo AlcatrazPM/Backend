@@ -3,6 +3,7 @@
 //! The `AccountsProvider` trait is needed for any implementation of an account manager.
 
 use userdata::siteinfo::SiteAccount;
+use http::response::Response;
 
 /// List of all possible return codes
 #[derive(PartialEq)]
@@ -21,6 +22,6 @@ pub trait AccountsProvider {
 
 
 pub trait AccountsControl {
-    fn modify_site_account_response(&self, json: Option<&str>, jwt: &str) -> String;
-    fn get_all_site_accounts_response(&self, jwt: &str) -> String;
+    fn modify_site_account_response(&self, json: Option<&str>, jwt: &str) -> Response;
+    fn get_all_site_accounts_response(&self, jwt: &str) -> Response;
 }
