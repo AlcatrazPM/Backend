@@ -6,4 +6,5 @@ members = [
     "accounts",
     "database",
     "userdata",
+    "http",
 ]

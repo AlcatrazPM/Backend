@@ -10,3 +10,4 @@ edition = "2018"
 database = { path = "../database" }
 authenticator = { path = "../authenticator" }
 accounts = { path = "../accounts" }
+http = { path = "../http" }
