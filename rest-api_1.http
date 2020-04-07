@@ -1,41 +1,48 @@
-POST http://127.1.1.1:8082/register
-Accept: */*
-Cache-Control: no-cache
-
-{"Username": "vlad_e_hispter@gmail.com", "Password": "notarealpasswordjustthehash"}
-
-####
-
-#POST http://127.1.1.1:8082/authenticate
+#POST http://127.1.1.1:8082/register
 #Accept: */*
 #Cache-Control: no-cache
 #
-#{"Username": "vlad_e_hispter@gmail.com", "Password": "notarealpasswordjustthehash"}
+#{"Username": "vlad_e_hipster@gmail.com", "Password": "notarealpasswordjustthehash"}
 
+####
+
+#POST http://127.1.1.1:8082/login
+#Accept: */*
+#Cache-Control: no-cache
+#
+#{"Username": "vlad_e_hipster@gmail.com", "Password": "notarealpasswordjustthehash"}
+#
+#<> 2020-04-07T125212.200.json
+#<> 2020-04-07T125144.200.json
+#<> 2020-04-07T123617.200.json
+#
 
 ###
 #
 #POST http://127.1.1.1:8082/modifypassword
-#Authentication: Bearer AAA.BBB.CCC
+#Authorization: Bearer abCdeFGhi.JkLmNoPQRS.tuVWXyZ
 #Accept: */*
 #Cache-Control: no-cache
 #
-#{"Username": "vlad_e_hispter@gmail.com", "OldPassword": "notarealpasswordjustthehash", "NewPassword": "newpasswordhash"}
+#{"Username": "vlad_e_hipster@gmail.com", "OldPassword": "notarealpasswordjustthehash", "NewPassword": "newpasswordhash"}
 
 ####
 #
 #POST http://127.1.1.1:8082/getaccounts
-#Authentication: Bearer AAA.BBB.CCC
+#Authorization: Bearer abCdeFGhi.JkLmNoPQRS.tuVWXyZ
 #Accept: */*
 #Cache-Control: no-cache
-
+#
+#<> 2020-04-07T125421.200.json
+#<> 2020-04-07T125411.200.json
+#
 
 ####
 #
-#POST http://127.1.1.1:8082/modifyaccount
-#Authentication: Bearer AAA.BBB.CCC
-#Accept: */*
-#Cache-Control: no-cache
-#
-#{"Operation": "add", "Site": {"Username": "vlad_e_hipster@gmail.com", "Password": "nohackerpls", "Id": "faranumar"}}
+POST http://127.1.1.1:8082/modifyaccount
+Authorization: Bearer abCdeFGhi.JkLmNoPQRS.tuVWXyZ
+Accept: */*
+Cache-Control: no-cache
+
+{"Operation": "add", "Site": {"Username": "vlad_e_hipster@gmail.com", "Password": "nohackerpls", "Id": "faranumar"}}
 ####

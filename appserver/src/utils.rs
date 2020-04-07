@@ -14,7 +14,7 @@ pub enum Requests {
 pub fn get_request_type(page: &str) -> Requests {
     if page.eq("/register") {
         return Requests::Register;
-    } else if page.eq("/authenticate") {
+    } else if page.eq("/login") {
         return Requests::Authentication;
     } else if page.eq("/modifypassword") {
         return Requests::ModifyMasterPassword;
@@ -28,7 +28,7 @@ pub fn get_request_type(page: &str) -> Requests {
 }
 
 pub fn authorise(request: &String) -> Option<&str> {
-    let auth_field = request.find("Authentication");
+    let auth_field = request.find("Authorization");
     if auth_field.is_none() {
         return None;
     }
@@ -51,7 +51,7 @@ pub fn authorise(request: &String) -> Option<&str> {
 }
 
 fn is_valid(jwt: &str) -> bool {
-    if jwt == "AAA.BBB.CCC" {
+    if jwt == "abCdeFGhi.JkLmNoPQRS.tuVWXyZ" {
         println!("JWT Valid");
         return true;
     }

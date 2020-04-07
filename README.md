@@ -60,7 +60,7 @@ modification, talk to the repo owner.
     - Request will be: 
     ```
     POST /modifypassword HTTP/1.1
-    Authentication: Bearer <jwt_token>
+    Authorization: Bearer <jwt_token>
     <any other fields>
     
     {
@@ -80,7 +80,7 @@ modification, talk to the repo owner.
     - Request will be:
     ```
     POST /getaccounts HTTP/1.1
-    Authentication: Bearer <jwt_token>
+    Authorization: Bearer <jwt_token>
     <any other fields>
     ```
     - Response will be:
@@ -111,7 +111,7 @@ modification, talk to the repo owner.
     - Request will be: 
     ```
    POST /modifyaccount HTTP/1.1
-   Authentication: Bearer <jwt_token>
+   Authorization: Bearer <jwt_token>
    <any other fields>
    
    {
@@ -124,7 +124,11 @@ modification, talk to the repo owner.
    }
    ```
    The `Action` field can be: `add`, `remove`, `modifiy`.
-   - Response will be: **TODO**
+   - Response will be: 
+   ```
+   HTTP/1.1 200 OK
+   <any other fields>
+   ```
    
     **Note**: The examples above show the JSONs as easily readable, in he proper
     requests, I will prefer all to be in one line.

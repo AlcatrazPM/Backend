@@ -26,7 +26,7 @@ where
 {
     fn login(&self, user: UserCredentials) -> (Token, AuthCodes) {
         // mock response
-        if user.username == "vlad_e_hispter@gmail.com".to_string() {
+        if user.username == "vlad_e_hipster@gmail.com".to_string() {
             return (
                 String::from("abCdeFGhi.JkLmNoPQRS.tuVWXyZ"),
                 AuthCodes::LoginOk,
@@ -40,7 +40,7 @@ where
         // PrimaryDataProvider::save_logs("test".to_string());
 
         // mock response
-        if user.username == "vlad_e_hispter@gmail.com".to_string() {
+        if user.username == "vlad_e_hipster@gmail.com".to_string() {
             return AuthCodes::RegisterOk;
         }
         return AuthCodes::InternalError;
