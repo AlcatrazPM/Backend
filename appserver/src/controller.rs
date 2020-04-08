@@ -81,8 +81,10 @@ where
             return;
         }
 
+
         // don't @me for this
         let buffer = String::from(String::from_utf8_lossy(&buffer[..]));
+        println!("{}", buffer);
 
         let body: &str = match buffer.rsplit_terminator("\r\n\r\n").next() {
             Some(data) => data,
