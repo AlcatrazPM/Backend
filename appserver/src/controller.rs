@@ -100,7 +100,13 @@ where
             None => None,
         };
 
-        let page = buffer.split_whitespace().nth(1).unwrap();
+        let page = match buffer.split_whitespace().nth(1) {
+            Some(p) => p,
+            None => {
+                self.write_stream(stream, Response::build().status(StatsCodes::BadRequest));
+                return;
+            }
+        };
         println!("{}", page);
 
         let jwt = authorise(&buffer);

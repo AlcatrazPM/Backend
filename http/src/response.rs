@@ -6,6 +6,7 @@ const END_LINE: &str = "\r\n";
 pub struct Response {
     version: String,
     status: StatsCodes,
+    access_control_origin: String,
     content_type: Option<String>,
     content_length: Option<u32>,
     body: Option<String>,
@@ -16,6 +17,8 @@ impl Response {
         Response {
             version: String::from("HTTP/1.1"),
             status: StatsCodes::NotImplemented,
+            // TODO: Don't leave it like this for final release
+            access_control_origin: String::from("*"),
             content_type: None,
             content_length: None,
             body: None,
@@ -50,6 +53,9 @@ impl ToString for Response {
         response.push_str(self.version.as_str());
         response.push_str(" ");
         response.push_str(self.status.to_string().as_str());
+        response.push_str(END_LINE);
+        response.push_str("Acces-Control-Allow-Origin: ");
+        response.push_str(self.access_control_origin.as_str());
         response.push_str(END_LINE);
 
         if let Some(ctype) = &self.content_type {
