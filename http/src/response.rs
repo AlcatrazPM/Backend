@@ -54,7 +54,7 @@ impl ToString for Response {
         response.push_str(" ");
         response.push_str(self.status.to_string().as_str());
         response.push_str(END_LINE);
-        response.push_str("Acces-Control-Allow-Origin: ");
+        response.push_str("Access-Control-Allow-Origin: ");
         response.push_str(self.access_control_origin.as_str());
         response.push_str(END_LINE);
 
