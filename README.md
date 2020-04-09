@@ -2,6 +2,11 @@
 
 ![crab pet](https://i.imgur.com/LbZJgmm.gif)
 
+# Important Notice
+The backend responses are not complete and they don't usually work in a browser due to the
+CORS policy. Please don't use a browser for requests at the moment. I am working on it and
+I am sorry for the inconvenience.
+
 # Compile & Run
 
 Compilation is made using the command `cargo build` in the root folder. The executable
@@ -23,7 +28,7 @@ modification, talk to the repo owner.
     <any other fields>
    
     {
-       "Username": "vlad_e_hispter@gmail.com",
+       "Username": "genericuser@emailclient.com",
        "Password": "notarealpasswordjustthehash"
     }
                
@@ -37,11 +42,11 @@ modification, talk to the repo owner.
 2. Authenticate
     - Request will be: 
     ```
-    POST /authenticate HTTP/1.1
+    POST /login HTTP/1.1
     <any other fields>
      
     {
-       "Username": "vlad_e_hispter@gmail.com",
+       "Username": "genericuser@emailclient.com",
        "Password": "notarealpasswordjustthehash"
     }
            
@@ -64,7 +69,7 @@ modification, talk to the repo owner.
     <any other fields>
     
     {
-        "Username": "vlad_e_hispter@gmail.com",
+        "Username": "genericuser@emailclient.com",
         "OldPassword": "notarealpasswordjustthehash",
         "NewPassword": "newpasswordhash"
     }
@@ -95,12 +100,12 @@ modification, talk to the repo owner.
             {
                 "Username": "ceva1",
                 "Password": "altceva2",
-                "Id": "id1"
+                "site": "site1.com"
             },
             {
                 "Username": "ceva2",
                 "Password": "altceva1",
-                "Id": "id2"
+                "site": "site2.com"
             }
         ]
     }
@@ -117,9 +122,9 @@ modification, talk to the repo owner.
    {
        "Operation": "add",
        "Site": {
-           "Username": "vlad_e_hipster@gmail.com",
+           "Username": "genericuser@emailclient.com",
            "Password": "nohackerpls",
-           "Id": "faranumar"
+           "site": "bestnsfwsite.com"
        }
    }
    ```
