@@ -168,6 +168,10 @@ modification, talk to the repo owner.
     HTTP/1.1 422 Unprocessable Entity
     <any other fields>
     ```
+    - Already Registered User
+   ```
+   HTTP/1.1 498 Already Registered User
+   ```
    - Unregistered User
    ```
    HTTP/1.1 499 Unregistered User
