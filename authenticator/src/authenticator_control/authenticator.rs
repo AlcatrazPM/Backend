@@ -13,7 +13,12 @@ pub fn register(user: UserCredentials) -> AuthCodes {
 
 pub fn login(user: UserCredentials) -> JWT {
     match get_user(&user.email) {
-        Ok(Some(user)) => JWT::JWT(generate_jwt(user)),
+        Ok(Some(db_user)) => {
+            if db_user.credential == user.password {
+                return JWT::JWT(generate_jwt(db_user));
+            }
+            JWT::Error(AuthCodes::BadPassword)
+        }
         Ok(None) => JWT::Error(AuthCodes::UnregisteredUser),
         Err(_) => JWT::Error(AuthCodes::DatabaseError),
     }
