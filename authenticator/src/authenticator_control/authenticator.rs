@@ -15,7 +15,10 @@ pub fn login(user: UserCredentials) -> JWT {
     match get_user(&user.email) {
         Ok(Some(db_user)) => {
             if db_user.credential == user.password {
-                return JWT::JWT(generate_jwt(db_user));
+                return JWT::JWT(match generate_jwt(db_user) {
+                    Some(jwt) => jwt,
+                    None => return JWT::Error(AuthCodes::InternalError),
+                });
             }
             JWT::Error(AuthCodes::BadPassword)
         }
