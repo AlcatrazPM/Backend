@@ -19,7 +19,10 @@ impl AppServer {
                     controller::modify_password,
                 ],
             )
-            .register(catchers![controller::unregistered_user])
+            .register(catchers![
+                controller::unregistered_user,
+                controller::already_registered,
+            ])
             .launch();
     }
 }

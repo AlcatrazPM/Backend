@@ -1,22 +1,20 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "PascalCase")]
 pub struct UserCredentials {
-    email: String,
-    password: String,
+    #[serde(alias = "Username")]
+    pub email: String,
+    pub password: String,
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "PascalCase")]
 pub struct ChangePassword {
-    #[serde(alias = "email")]
-    user: String,
-    old_password: String,
-    new_password: String,
-}
-
-#[derive(Debug, Serialize)]
-pub struct ResponseJWT {
-    pub jwt: String,
+    #[serde(alias = "Username")]
+    pub user: String,
+    pub old_password: String,
+    pub new_password: String,
 }
 
 #[allow(dead_code)]
@@ -29,5 +27,26 @@ pub enum AuthCodes {
     BadPassword,
     ChangedPassword,
     RegisterOk,
+    AlreadyRegistered,
     LoginOk,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct DatabaseUser {
+    #[serde(rename = "_id")]
+    pub(crate) id: bson::oid::ObjectId,
+    pub(crate) clear_entries: Vec<SiteAccount>,
+    pub(crate) credential: String,
+    pub(crate) date: String,
+    pub(crate) e_dek: String,
+    pub email: String,
+    pub(crate) i_kek: String,
+    pub(crate) secure_entries: Vec<SiteAccount>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct SiteAccount {
+    pub(crate) pass: String,
+    pub(crate) site: String,
+    pub(crate) user: String,
 }
