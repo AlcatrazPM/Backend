@@ -3,14 +3,18 @@
 ![crab pet](https://i.imgur.com/LbZJgmm.gif)
 
 # Important Notice
-The backend responses are not complete and they don't usually work in a browser due to the
+
+1. The backend is going in a long redesinging faze, such that the AccountsProvider is no longer
+present in the repo. At the moment all effort is going to Authenticator (full feature).
+2. The backend responses are not complete and they don't usually work in a browser due to the
 CORS policy. Please don't use a browser for requests at the moment. I am working on it and
 I am sorry for the inconvenience.
 
 # Compile & Run
 
-Compilation is made using the command `cargo build` in the root folder. The executable
-is built in */target/appserver* (or *\target\appserver.exe* in Windows). It can be either
+There will be 2 main folders in the root directory, authenticator and accountsprovider.
+Compilation is made using the command `cargo build` in the specific folder. The executable
+is built in */target/<dir_name>* (or *\target\<dir_name>.exe* in Windows). It can be either
 run directly or by `cargo run`.
 The server will start and listen on port 8082 (need to change this) and any requests
 made to it will be printed to the console (for debugging).
@@ -139,7 +143,7 @@ modification, talk to the repo owner.
     requests, I will prefer all to be in one line.
     
 5. Error Responses
-    - Incorrect JSON Format 
+    - Incorrect Body Format
     ```
     HTTP/1.1 400 Bad Request
     <any other fields>
@@ -158,6 +162,15 @@ modification, talk to the repo owner.
    ```
    HTTP/1.1 404 Not Found
    <any other fields>
+   ```
+   - Incorrect JSON Format
+    ```
+    HTTP/1.1 422 Unprocessable Entity
+    <any other fields>
+    ```
+    - Already Registered User
+   ```
+   HTTP/1.1 498 Already Registered User
    ```
    - Unregistered User
    ```
