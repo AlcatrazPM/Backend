@@ -72,18 +72,14 @@ pub fn is_valid(jwt: &str) -> bool {
         }
     };
 
-    let decoded = decode::<Claim>(
-        &jwt,
-        secret.as_ref(),
-        &Validation::default(),
-    );
+    let decoded = decode::<Claim>(&jwt, secret.as_ref(), &Validation::default());
 
     let token = match decoded {
         Ok(token) => token,
         Err(_) => {
             println!("Incorrect jwt");
             return false;
-        },
+        }
     };
 
     println!("Claim is: {:?}", token.claims);
@@ -120,9 +116,9 @@ impl<'a, 'r> FromRequest<'a, 'r> for ApiKey {
 mod jwt_numeric_date {
     //! Custom serialization of DateTime<Utc> to conform with the JWT spec (RFC 7519 section 2, "Numeric Date")
     use chrono::{DateTime, TimeZone, Utc};
-    use serde::{self, Deserialize, Deserializer, Serializer};
     #[allow(unused_imports)]
     use serde::de::Error;
+    use serde::{self, Deserialize, Deserializer, Serializer};
 
     /// Serializes a DateTime<Utc> to a Unix timestamp (milliseconds since 1970/1/1T00:00:00T)
     pub fn serialize<S>(date: &DateTime<Utc>, serializer: S) -> Result<S::Ok, S::Error>
