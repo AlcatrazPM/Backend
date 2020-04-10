@@ -9,7 +9,6 @@ extern crate jsonwebtoken;
 
 use self::jsonwebtoken::{decode, encode, Header, Validation};
 use std::env;
-use std::env::VarError;
 
 static JWT_KEY: &str = "very_secret";
 
