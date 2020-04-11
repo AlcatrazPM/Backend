@@ -43,8 +43,8 @@ pub fn generate_jwt(user: DatabaseUser) -> Option<String> {
     println!("secret is {}", secret);
 
     let claim = Claim {
-        // exp: (Utc::now() + Duration::minutes(15)),
-        exp: (Utc::now() + Duration::minutes(3)),
+        exp: (Utc::now() + Duration::minutes(15)),
+        // exp: (Utc::now() + Duration::minutes(3)),
         iat: Utc::now(),
         iss: "AlcatrazAuth".to_string(),
         usr: user.email,
