@@ -4,5 +4,6 @@
 #Added by cargo
 
 /target
-
+/authenticator/target
+/authenticator/.idea
 

@@ -1,0 +1,28 @@
+[package]
+name = "authenticator"
+version = "0.1.0"
+authors = ["Adrian Scrab <adrian.scrab@pm.me>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde = { version = "1.0.106", features = ["derive"] }
+jsonwebtoken = "5.0.1"
+#cookie = {version="0.11.2", optional=false}
+rocket = { version = "0.4.4", optional=false }
+#mongodb = { version = "0.4.0", optional=false }
+#mongodb = "0.4.0"
+mongodb = "0.3.12"
+#bson = "0.14.1"
+bson = "0.13.0"
+chrono = "0.4.11"
+
+[dependencies.rocket_contrib]
+version = "0.4.4"
+default-features = false
+#features = ["json", "mongodb_pool"]
+features = ["json"]
+
+#[global.databases]
+#mongodb = { url = "localhost:27017" }
