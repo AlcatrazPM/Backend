@@ -56,7 +56,7 @@ All information to and from the backend will be given in JSON format. I suggest 
        "name": "Placeholder Dorel",
        "password": "notarealpasswordjustthehash"
        "e_dek": "SuchSecurity",
-       "i_kek": "MushEncryption",
+       "i_kek": "MuchEncryption",
     }
                
     ```
@@ -168,7 +168,7 @@ All information to and from the backend will be given in JSON format. I suggest 
     
     ```
    
-6. Add/Remove/Modify Account Information
+6. Add/Remove/Modify Account Information (**Not Implemented**)
     - Request will be: 
     ```
    POST /modifyaccount HTTP/1.1
