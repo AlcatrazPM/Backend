@@ -4,26 +4,46 @@
 
 # Important Notice
 
-1. The backend is going in a long redesinging faze, such that the AccountsProvider is no longer
-present in the repo. At the moment all effort is going to Authenticator (full feature).
-2. The backend responses are not complete and they don't usually work in a browser due to the
-CORS policy. Please don't use a browser for requests at the moment. I am working on it and
-I am sorry for the inconvenience.
+1. The backend is going in a long redesinging faze, such that the **accountsprovider** is no longer present in the repo. At the moment all effort is going to **authenticator** (full feature).
+2. The backend responses are not complete and they don't usually work in a browser due to the CORS policy. Please don't use a browser for requests at the moment. I am working on it and I am sorry for the inconvenience.
 
 # Compile & Run
 
-There will be 2 main folders in the root directory, authenticator and accountsprovider.
-Compilation is made using the command `cargo build` in the specific folder. The executable
-is built in */target/<dir_name>* (or *\target\<dir_name>.exe* in Windows). It can be either
-run directly or by `cargo run`.
-The server will start and listen on port 8082 (need to change this) and any requests
-made to it will be printed to the console (for debugging).
+> [!IMPORTANT]
+> All code must be compiled with rust nightly.
+> To use nightly run command `rustup override set nightly` before `cargo build`.
+
+There will be 2 main folders in the root directory, **authenticator** and **accountsprovider**. Compilation is made using the command `cargo build` in the specific folder. The executable is built in *<dir_name>/target/debug/* with the name of the directory. It can be run dirrectly or by `cargo run`.
+
+## Environment Variables
+
+Setting variables:
+
+- Linux
+    - `<key1>=<val1> cargo run`
+    - there can be as many combinations `<key1>=<val1>` before the cargo command.
+
+- Windows
+    - `$env:<key1>='<val1>'`, one variable per command,
+    - `cargo run`
+
+Variables that can be set are:
+
+1. `ROCKET_ENV` is the environment of the server. The changes made by this setting are found int the `Rocket.toml` file. Values can be:
+    - `development` or `dev`
+    - `staging` or `stage`
+    - `production` or `prod`
+
+2. `KEY` is the key with which to encode and decode the JWT token. Value is a string.
+
+3. Database Location which has key `AUTH_DB` for the **authenticator** and `ACCT_DB` for the **accountsprovider**. Value is of type `<host>:<port>` where *host* is an ip or preconfigured host and *port* is a number ranging from [1, 65535].
+
+**Example**: `ROCKET_ENV=dev KEY=secret AUTH_DB=localhost:27017 cargo run` will set the server to run in development mode with the encoding key 'secret' for the JWTs and the database situated at address localhost at port 27017.
+
 
 # Frontend Unified Communication Key
 
-All information to and from the backend will be given in JSON format. I suggest the
-following formatting for this (please, it will make my life easier). For any 
-modification, talk to the repo owner.
+All information to and from the backend will be given in JSON format. I suggest the following formatting for this (please, it will make my life easier). For any modification, talk to the repo owner.
 
 1. Register
     - Request will be:
@@ -32,8 +52,11 @@ modification, talk to the repo owner.
     <any other fields>
    
     {
-       "Username": "genericuser@emailclient.com",
-       "Password": "notarealpasswordjustthehash"
+       "username": "genericuser@emailclient.com",
+       "name": "Placeholder Dorel",
+       "password": "notarealpasswordjustthehash"
+       "e_dek": "SuchSecurity",
+       "i_kek": "MushEncryption",
     }
                
     ```
@@ -50,8 +73,8 @@ modification, talk to the repo owner.
     <any other fields>
      
     {
-       "Username": "genericuser@emailclient.com",
-       "Password": "notarealpasswordjustthehash"
+       "username": "genericuser@emailclient.com",
+       "password": "notarealpasswordjustthehash"
     }
            
     ```
@@ -65,7 +88,7 @@ modification, talk to the repo owner.
    { "jwt": "<token>" }
    ```
   
-2. Modify Master Password
+3. Modify Master Password
     - Request will be: 
     ```
     POST /modifypassword HTTP/1.1
@@ -73,9 +96,9 @@ modification, talk to the repo owner.
     <any other fields>
     
     {
-        "Username": "genericuser@emailclient.com",
-        "OldPassword": "notarealpasswordjustthehash",
-        "NewPassword": "newpasswordhash"
+        "username": "genericuser@emailclient.com",
+        "old_password": "notarealpasswordjustthehash",
+        "new_password": "newpasswordhash"
     }
            
     ```
@@ -85,7 +108,32 @@ modification, talk to the repo owner.
    <any other fields>
    ```
 
-3. Get Accounts List
+4. Modify Email / Name / Session Timer (**Not Implemented**)
+    - Request will be: 
+    ```
+    POST /modifyacctdata HTTP/1.1
+    Authorization: Bearer <jwt_token>
+    <any other fields>
+    
+    {
+        "field_name": <field_name>
+        "new_value": <new_value>
+    }      
+    ```
+   - Response will be:
+   ```
+   HTTP/1.1 200 OK
+   <any other fields>
+   ```
+
+   The `field_name` can be:
+   - `"email"`
+   - `"name"`
+   - `"session_timer"`
+   
+   The field `new_value` holds a string, even the session timer.
+
+5. Get Accounts List (**Not Implemented**)
     - Request will be:
     ```
     POST /getaccounts HTTP/1.1
@@ -100,23 +148,27 @@ modification, talk to the repo owner.
     <any other fields>
     
     {
-        "Accounts": [
+        "accounts": [
             {
-                "Username": "ceva1",
-                "Password": "altceva2",
+                "id": "random_string1"
                 "site": "site1.com"
+                "username": "ceva1",
+                "password": "altceva2",
+                "favourite": true
             },
             {
-                "Username": "ceva2",
-                "Password": "altceva1",
+                "id": "random_string2"
                 "site": "site2.com"
+                "username": "ceva2",
+                "password": "altceva1",
+                "favourite": false
             }
         ]
     }
     
     ```
    
-4. Add/Remove/Modify Account Information
+6. Add/Remove/Modify Account Information
     - Request will be: 
     ```
    POST /modifyaccount HTTP/1.1
@@ -124,25 +176,24 @@ modification, talk to the repo owner.
    <any other fields>
    
    {
-       "Operation": "add",
-       "Site": {
-           "Username": "genericuser@emailclient.com",
-           "Password": "nohackerpls",
+       "operation": "add",
+       "site": {
+           "id": "random_string"
            "site": "bestnsfwsite.com"
+           "username": "genericuser@emailclient.com",
+           "password": "nohackerpls",
+           "favourite": false
        }
    }
    ```
-   The `Action` field can be: `add`, `remove`, `modifiy`.
+   The `Action` field can be: `add`, `remove`, `modifiy`. Any of the fields in the `site` parameter can be changed for `modify` apart from `id`.
    - Response will be: 
    ```
    HTTP/1.1 200 OK
    <any other fields>
    ```
-   
-    **Note**: The examples above show the JSONs as easily readable, in he proper
-    requests, I will prefer all to be in one line.
     
-5. Error Responses
+7. Error Responses
     - Incorrect Body Format
     ```
     HTTP/1.1 400 Bad Request
@@ -187,3 +238,6 @@ modification, talk to the repo owner.
    <any other fields>
    ```
    
+## JWT
+
+It is valid for 15 minutes.
