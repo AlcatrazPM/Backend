@@ -34,6 +34,8 @@ pub fn modify_password(data: ChangePassword) -> AuthCodes {
     let user: UserCredentials = UserCredentials {
         email: data.user,
         password: data.old_password,
+        e_dek: "".to_string(),
+        i_kek: "".to_string(),
     };
     match change_password(user, data.new_password) {
         Ok(code) => code,

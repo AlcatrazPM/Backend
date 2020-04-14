@@ -80,12 +80,14 @@ pub fn change_password(user: UserCredentials, new_password: String) -> Result<Au
 fn build_db_user(user: UserCredentials) -> Result<DatabaseUser, Error> {
     Ok(DatabaseUser {
         id: bson::oid::ObjectId::new()?,
-        clear_entries: vec![],
+        email: user.email,
+        name: "Placeholder Dorel".to_string(),
+        session_timer: 15,      // default timer
         credential: user.password,
         date: Utc::now().to_string(),
-        e_dek: "A".to_string(),
-        email: user.email,
-        i_kek: "B".to_string(),
-        secure_entries: vec![],
+        // e_dek: "SuchSecurity".to_string(),
+        // i_kek: "MuchEncryption".to_string(),
+        e_dek: user.e_dek,
+        i_kek: user.i_kek,
     })
 }

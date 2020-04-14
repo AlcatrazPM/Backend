@@ -1,17 +1,19 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "PascalCase")]
+// #[serde(rename_all = "PascalCase")]
 pub struct UserCredentials {
-    #[serde(alias = "Username")]
+    #[serde(alias = "username")]
     pub email: String,
     pub password: String,
+    pub e_dek: String,
+    pub i_kek: String,
 }
 
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "PascalCase")]
+// #[serde(rename_all = "PascalCase")]
 pub struct ChangePassword {
-    #[serde(alias = "Username")]
+    #[serde(alias = "username")]
     pub user: String,
     pub old_password: String,
     pub new_password: String,
@@ -34,14 +36,14 @@ pub enum AuthCodes {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct DatabaseUser {
     #[serde(rename = "_id")]
-    pub(crate) id: bson::oid::ObjectId,
-    pub(crate) clear_entries: Vec<SiteAccount>,
-    pub(crate) credential: String,
-    pub(crate) date: String,
-    pub(crate) e_dek: String,
+    pub id: bson::oid::ObjectId,
     pub email: String,
-    pub(crate) i_kek: String,
-    pub(crate) secure_entries: Vec<SiteAccount>,
+    pub name: String,
+    pub date: String,
+    pub session_timer: i64,
+    pub credential: String,
+    pub e_dek: String,
+    pub i_kek: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

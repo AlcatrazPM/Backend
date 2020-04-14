@@ -41,13 +41,15 @@ pub fn generate_jwt(user: DatabaseUser) -> Option<String> {
         }
     };
     println!("secret is {}", secret);
+    // println!("_id is {}, serialize: {} and as deserialize: {}", user.id, user.id.to_hex(), bson::oid::ObjectId);
 
     let claim = Claim {
-        exp: (Utc::now() + Duration::minutes(15)),
+        // exp: (Utc::now() + Duration::minutes(1)),
+        exp: (Utc::now() + Duration::minutes(user.session_timer as i64)),
         // exp: (Utc::now() + Duration::minutes(3)),
         iat: Utc::now(),
         iss: "AlcatrazAuth".to_string(),
-        usr: user.email,
+        usr: user.id.to_hex(),
     };
 
     match encode(&Header::default(), &claim, secret.as_ref()) {
