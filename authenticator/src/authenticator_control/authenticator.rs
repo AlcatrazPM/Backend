@@ -1,6 +1,6 @@
 use crate::dataprovider::primary_data_provider::{change_password, get_user, insert_user};
 use crate::jwt::{generate_jwt, JWT};
-use crate::userdata::{AuthCodes, ChangePassword, UserCredentials};
+use crate::userdata::{AuthCodes, ChangePassword, UserCredentials, LoginCredentials};
 
 #[allow(dead_code)]
 pub fn register(user: UserCredentials) -> AuthCodes {
@@ -11,7 +11,7 @@ pub fn register(user: UserCredentials) -> AuthCodes {
     }
 }
 
-pub fn login(user: UserCredentials) -> JWT {
+pub fn login(user: LoginCredentials) -> JWT {
     match get_user(&user.email) {
         Ok(Some(db_user)) => {
             if db_user.credential == user.password {

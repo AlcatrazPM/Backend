@@ -11,6 +11,13 @@ pub struct UserCredentials {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct LoginCredentials {
+    #[serde(alias = "username")]
+    pub email: String,
+    pub password: String,
+}
+
+#[derive(Debug, Deserialize)]
 // #[serde(rename_all = "PascalCase")]
 pub struct ChangePassword {
     #[serde(alias = "username")]

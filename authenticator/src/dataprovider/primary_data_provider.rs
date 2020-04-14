@@ -4,9 +4,51 @@ use mongodb::{Client, Error, ThreadedClient};
 use crate::userdata::{AuthCodes, DatabaseUser, UserCredentials};
 use chrono::Utc;
 use mongodb::coll::Collection;
+use std::env;
+use std::str::FromStr;
+
+static AUTH_DB: &str = "localhost:27017";
+
+fn parse_db_env_var(env: &str) -> (String, u16) {
+    let db = match env::var(env) {
+        Ok(val) => val,
+        Err(_) => {
+            println!("Setting to default listening connection for MongoDB");
+            AUTH_DB.to_string()
+        }
+    };
+
+    let db: Vec<&str> = db.split(":").collect();
+    let host = match db.get(0) {
+        Some(val) => *val,
+        None => {
+            println!("Setting to default listening connection for MongoDB");
+            return ("localhost".to_string(), 27017);
+        }
+    };
+    let port = match db.get(1) {
+        Some(val) => (*val),
+        None => {
+            println!("Setting to default listening connection for MongoDB");
+            return ("localhost".to_string(), 27017);
+        }
+    };
+    let port = match u16::from_str(port) {
+        Ok(val) => val,
+        Err(_) => {
+            println!("Setting to default listening connection for MongoDB");
+            return ("localhost".to_string(), 27017);
+        }
+    };
+
+    (String::from(host), port)
+}
 
 fn connect() -> Result<Collection, Error> {
-    let client = Client::connect("localhost", 27017)?;
+    let (host, port): (String, u16) = parse_db_env_var("AUTH_DB");
+    println!("DB is {}:{}", host, port);
+
+    let client = Client::connect(host.as_str(), port)?;
 
     Ok(client.db("alcatraz").collection("users"))
 }

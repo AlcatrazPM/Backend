@@ -1,6 +1,6 @@
 use crate::authenticator_control::authenticator;
 use crate::jwt::{ApiKey, ResponseJWT, JWT};
-use crate::userdata::{AuthCodes, ChangePassword, UserCredentials};
+use crate::userdata::{AuthCodes, ChangePassword, UserCredentials, LoginCredentials};
 use rocket::http::Status;
 use rocket::response::Responder;
 use rocket::{Request, Response};
@@ -13,7 +13,7 @@ pub fn register(credentials: Json<UserCredentials>) -> Status {
 }
 
 #[post("/login", data = "<credentials>")]
-pub fn login(credentials: Json<UserCredentials>) -> Result<Json<ResponseJWT>, Status> {
+pub fn login(credentials: Json<LoginCredentials>) -> Result<Json<ResponseJWT>, Status> {
     // println!("{}", format!("Your login data is: {:?}", credentials));
     match authenticator::login(credentials.0) {
         JWT::JWT(jwt) => Ok(Json(ResponseJWT { jwt })),
