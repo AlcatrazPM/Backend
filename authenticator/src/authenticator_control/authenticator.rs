@@ -33,6 +33,7 @@ pub fn modify_password(data: ChangePassword) -> AuthCodes {
     // AuthCodes::ChangedPassword
     let user: UserCredentials = UserCredentials {
         email: data.user,
+        name: "".to_string(),
         password: data.old_password,
         e_dek: "".to_string(),
         i_kek: "".to_string(),

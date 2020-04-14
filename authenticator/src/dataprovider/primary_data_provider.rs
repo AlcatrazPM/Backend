@@ -123,7 +123,7 @@ fn build_db_user(user: UserCredentials) -> Result<DatabaseUser, Error> {
     Ok(DatabaseUser {
         id: bson::oid::ObjectId::new()?,
         email: user.email,
-        name: "Placeholder Dorel".to_string(),
+        name: user.name,
         session_timer: 15,      // default timer
         credential: user.password,
         date: Utc::now().to_string(),

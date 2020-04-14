@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 pub struct UserCredentials {
     #[serde(alias = "username")]
     pub email: String,
+    pub name: String,
     pub password: String,
     pub e_dek: String,
     pub i_kek: String,
