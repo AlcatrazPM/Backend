@@ -17,6 +17,7 @@ impl AppServer {
                     controller::register,
                     controller::login,
                     controller::modify_password,
+                    controller::modify_account_data,
                 ],
             )
             .register(catchers![

@@ -27,17 +27,31 @@ pub struct ChangePassword {
     pub new_password: String,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct ChangeAcctData {
+    pub field_name: String,
+    pub new_value: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub enum ParsedChangeAcctData {
+    Email(String),
+    Name(String),
+    SessionTimer(i64),
+}
+
 #[allow(dead_code)]
 #[derive(PartialEq)]
 pub enum AuthCodes {
     NotImplemented,
     DatabaseError,
     InternalError,
+    AlreadyRegistered,
     UnregisteredUser,
     BadPassword,
     ChangedPassword,
+    ChangedData,
     RegisterOk,
-    AlreadyRegistered,
     LoginOk,
 }
 

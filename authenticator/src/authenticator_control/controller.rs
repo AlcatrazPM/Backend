@@ -1,6 +1,6 @@
 use crate::authenticator_control::authenticator;
-use crate::jwt::{ApiKey, ResponseJWT, JWT};
-use crate::userdata::{AuthCodes, ChangePassword, UserCredentials, LoginCredentials};
+use crate::jwt::{ApiKey, ResponseJWT, JWT, get_claim};
+use crate::userdata::{AuthCodes, ChangePassword, UserCredentials, LoginCredentials, ChangeAcctData};
 use rocket::http::Status;
 use rocket::response::Responder;
 use rocket::{Request, Response};
@@ -28,6 +28,18 @@ pub fn modify_password(credentials: Json<ChangePassword>, key: ApiKey) -> Status
     handle_code(authenticator::modify_password(credentials.0))
 }
 
+#[post("/modifyacctdata", data = "<data>")]
+pub fn modify_account_data(data: Json<ChangeAcctData>, key: ApiKey) -> Status {
+    // TODO: Get Claim from ApiKey
+    let claim = match get_claim(key.key.as_str()) {
+        Some(data) => data,
+        None => return Status::InternalServerError,
+    };
+
+    handle_code(authenticator::modify_acct_data(data.0, claim))
+    // unimplemented!()
+}
+
 #[catch(499)]
 pub(crate) fn unregistered_user<'r>(req: &'_ Request) -> Response<'r> {
     "Unregistered User".respond_to(req).ok().unwrap()
@@ -46,6 +58,7 @@ fn handle_code(code: AuthCodes) -> Status {
         AuthCodes::InternalError => Status::InternalServerError,
         AuthCodes::BadPassword => Status::Unauthorized,
         AuthCodes::ChangedPassword => Status::Ok,
+        AuthCodes::ChangedData => Status::Ok,
         AuthCodes::RegisterOk => Status::Ok,
         AuthCodes::LoginOk => Status::Ok,
         AuthCodes::AlreadyRegistered => Status::new(498, "Already Registered User"),

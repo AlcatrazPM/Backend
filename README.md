@@ -108,7 +108,7 @@ All information to and from the backend will be given in JSON format. I suggest 
    <any other fields>
    ```
 
-4. Modify Email / Name / Session Timer (**Not Implemented**)
+4. Modify Email / Name / Session Timer
     - Request will be: 
     ```
     POST /modifyacctdata HTTP/1.1

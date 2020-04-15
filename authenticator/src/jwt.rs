@@ -23,13 +23,13 @@ pub struct ResponseJWT {
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
-struct Claim {
+pub struct Claim {
     #[serde(with = "jwt_numeric_date")]
     exp: DateTime<Utc>,
     #[serde(with = "jwt_numeric_date")]
     iat: DateTime<Utc>,
     iss: String,
-    usr: String,
+    pub usr: String,
 }
 
 pub fn generate_jwt(user: DatabaseUser) -> Option<String> {
@@ -58,10 +58,10 @@ pub fn generate_jwt(user: DatabaseUser) -> Option<String> {
     }
 }
 
-pub fn is_valid(jwt: &str) -> bool {
+pub fn get_claim(jwt: &str) -> Option<Claim> {
     let jwt: &str = match jwt.split_ascii_whitespace().last() {
         Some(token) => token,
-        None => return false,
+        None => return None,
     };
     println!("JWT is: {:?}", jwt);
 
@@ -79,17 +79,27 @@ pub fn is_valid(jwt: &str) -> bool {
         Ok(token) => token,
         Err(_) => {
             println!("Incorrect jwt");
-            return false;
+            return None;
         }
     };
 
     println!("Claim is: {:?}", token.claims);
 
-    true
+    Some(token.claims)
 }
 
+pub fn is_valid(jwt: &str) -> bool {
+    match get_claim(jwt) {
+        Some(_) => true,
+        None => false,
+    }
+}
+
+
 #[derive(Debug)]
-pub struct ApiKey(String);
+pub struct ApiKey {
+    pub key: String
+}
 
 #[derive(Debug)]
 pub enum ApiKeyError {
@@ -107,7 +117,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for ApiKey {
 
         match keys.len() {
             0 => Outcome::Failure((Status::BadRequest, ApiKeyError::Missing)),
-            1 if is_valid(keys[0]) => Outcome::Success(ApiKey(keys[0].to_string())),
+            1 if is_valid(keys[0]) => Outcome::Success(ApiKey{key: keys[0].to_string()}),
             1 => Outcome::Failure((Status::Forbidden, ApiKeyError::Invalid)),
             _ => Outcome::Failure((Status::Forbidden, ApiKeyError::BadCount)),
         }

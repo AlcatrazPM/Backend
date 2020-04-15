@@ -1,6 +1,7 @@
-use crate::dataprovider::primary_data_provider::{change_password, get_user, insert_user};
-use crate::jwt::{generate_jwt, JWT};
-use crate::userdata::{AuthCodes, ChangePassword, UserCredentials, LoginCredentials};
+use crate::dataprovider::primary_data_provider::{change_password, get_user, insert_user, change_account_data, UserId};
+use crate::jwt::{generate_jwt, JWT, Claim};
+use crate::userdata::{AuthCodes, ChangePassword, UserCredentials, LoginCredentials, ChangeAcctData, ParsedChangeAcctData};
+use std::str::FromStr;
 
 #[allow(dead_code)]
 pub fn register(user: UserCredentials) -> AuthCodes {
@@ -12,7 +13,7 @@ pub fn register(user: UserCredentials) -> AuthCodes {
 }
 
 pub fn login(user: LoginCredentials) -> JWT {
-    match get_user(&user.email) {
+    match get_user(UserId::Email(user.email)) {
         Ok(Some(db_user)) => {
             if db_user.credential == user.password {
                 return JWT::JWT(match generate_jwt(db_user) {
@@ -42,6 +43,38 @@ pub fn modify_password(data: ChangePassword) -> AuthCodes {
         Ok(code) => code,
         Err(e) => {
             println!("Error at modified pass: {:?}", e);
+            AuthCodes::DatabaseError
+        }
+    }
+}
+
+pub fn modify_acct_data(data: ChangeAcctData, claim: Claim) -> AuthCodes {
+    let id = match bson::oid::ObjectId::with_string(claim.usr.as_str()) {
+        Ok(id) => id,
+        Err(_) => return AuthCodes::InternalError,
+    };
+
+    println!("change (id: {:?} ) is: {:?}", id, data);
+
+    let parsed_data = match data.field_name.as_str() {
+        "email" => ParsedChangeAcctData::Email(data.new_value),
+        "name" => ParsedChangeAcctData::Name(data.new_value),
+        "session_timer" => {
+            let timer = match i64::from_str(data.new_value.as_str()) {
+                Ok(t) => t,
+                Err(_) => return AuthCodes::InternalError,
+            };
+            ParsedChangeAcctData::SessionTimer(timer)
+        },
+        _ => return AuthCodes::InternalError
+    };
+
+    println!("parsed data is: {:?}", parsed_data);
+
+    match change_account_data(id, parsed_data) {
+        Ok(code) => code,
+        Err(e) => {
+            println!("Error at modified other data: {:?}", e);
             AuthCodes::DatabaseError
         }
     }

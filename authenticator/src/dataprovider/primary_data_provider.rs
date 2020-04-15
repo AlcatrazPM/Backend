@@ -1,11 +1,12 @@
 use mongodb::db::ThreadedDatabase;
 use mongodb::{Client, Error, ThreadedClient};
 
-use crate::userdata::{AuthCodes, DatabaseUser, UserCredentials};
+use crate::userdata::{AuthCodes, DatabaseUser, UserCredentials, ParsedChangeAcctData};
 use chrono::Utc;
 use mongodb::coll::Collection;
 use std::env;
 use std::str::FromStr;
+use bson::ordered::OrderedDocument;
 
 static AUTH_DB: &str = "localhost:27017";
 
@@ -53,10 +54,15 @@ fn connect() -> Result<Collection, Error> {
     Ok(client.db("alcatraz").collection("users"))
 }
 
-pub fn get_user(_email: &str) -> Result<Option<DatabaseUser>, Error> {
+pub fn get_user(id: UserId) -> Result<Option<DatabaseUser>, Error> {
     let coll = connect()?;
 
-    let filter = doc! { "email" => _email };
+
+    let filter = match  id {
+        UserId::ObjectId(oid) => doc! { "_id": oid },
+        UserId::Email(email) => doc! { "email" => email },
+    };
+
     let result = coll.find_one(Some(filter), None);
 
     let user = match result {
@@ -77,7 +83,7 @@ pub fn get_user(_email: &str) -> Result<Option<DatabaseUser>, Error> {
 
 pub fn insert_user(user: UserCredentials) -> Result<bool, Error> {
     let coll = connect()?;
-    if let Ok(Some(_)) = get_user(&user.email) {
+    if let Ok(Some(_)) = get_user(UserId::Email(user.email.clone())) {
         return Ok(false);
     }
 
@@ -95,17 +101,9 @@ pub fn insert_user(user: UserCredentials) -> Result<bool, Error> {
     Ok(true)
 }
 
-pub fn change_password(user: UserCredentials, new_password: String) -> Result<AuthCodes, Error> {
+fn update_user(user: DatabaseUser, filter: OrderedDocument) -> Result<(), Error> {
     let coll = connect()?;
-    let mut user = match get_user(&user.email) {
-        Ok(Some(u)) => u,
-        Ok(None) => return Ok(AuthCodes::UnregisteredUser),
-        Err(e) => return Err(e),
-    };
-    let filter = doc! { "email" => user.email.clone() };
 
-    user.credential = new_password;
-    // println!("update this: {:?}", &user);
     let serialized_user = bson::to_bson(&user)?;
     if let bson::Bson::Document(document) = serialized_user {
         coll.replace_one(filter, document, None)?;
@@ -115,8 +113,48 @@ pub fn change_password(user: UserCredentials, new_password: String) -> Result<Au
             "converting the BSON object".to_string(),
         ));
     }
+    Ok(())
+}
 
-    Ok(AuthCodes::ChangedPassword)
+pub fn change_password(user: UserCredentials, new_password: String) -> Result<AuthCodes, Error> {
+    let mut user = match get_user(UserId::Email(user.email)) {
+        Ok(Some(u)) => u,
+        Ok(None) => return Ok(AuthCodes::UnregisteredUser),
+        Err(e) => return Err(e),
+    };
+    let filter = doc! { "email" => user.email.clone() };
+
+    user.credential = new_password;
+
+    match update_user(user, filter) {
+        Ok(_) => Ok(AuthCodes::ChangedPassword),
+        Err(e) => Err(e),
+    }
+}
+
+pub fn change_account_data(id: bson::oid::ObjectId, data: ParsedChangeAcctData) -> Result<AuthCodes, Error> {
+    let mut user = match get_user(UserId::ObjectId(id.clone())) {
+        Ok(Some(u)) => u,
+        Ok(None) => return Ok(AuthCodes::UnregisteredUser),
+        Err(e) => return Err(e),
+    };
+
+    println!("user is: {:?}", user);
+
+    match data {
+        ParsedChangeAcctData::Email(email) => user.email = email,
+        ParsedChangeAcctData::Name(name) => user.name = name,
+        ParsedChangeAcctData::SessionTimer(timer) => user.session_timer = timer,
+    };
+
+    println!("user is: {:?}", user);
+
+    let filter = doc! { "_id": id };
+
+    match update_user(user, filter) {
+        Ok(_) => Ok(AuthCodes::ChangedData),
+        Err(e) => Err(e),
+    }
 }
 
 fn build_db_user(user: UserCredentials) -> Result<DatabaseUser, Error> {
@@ -132,4 +170,10 @@ fn build_db_user(user: UserCredentials) -> Result<DatabaseUser, Error> {
         e_dek: user.e_dek,
         i_kek: user.i_kek,
     })
+}
+
+
+pub enum UserId {
+    ObjectId(bson::oid::ObjectId),
+    Email(String),
 }
