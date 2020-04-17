@@ -11,7 +11,6 @@ use crate::appserver::AppServer;
 mod appserver;
 mod authenticator_control;
 mod dataprovider;
-mod jwt;
 
 fn main() {
     AppServer::run();

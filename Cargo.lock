@@ -28,12 +28,11 @@ dependencies = [
 
 [[package]]
 name = "authenticator"
-version = "0.1.0"
+version = "0.2.1"
 dependencies = [
  "bson",
  "chrono",
  "dataprovider",
- "jsonwebtoken",
  "jwt",
  "mongodb",
  "rocket",
@@ -445,6 +444,13 @@ dependencies = [
 [[package]]
 name = "jwt"
 version = "0.1.0"
+dependencies = [
+ "chrono",
+ "jsonwebtoken",
+ "rocket",
+ "serde",
+ "userdata",
+]
 
 [[package]]
 name = "kernel32-sys"

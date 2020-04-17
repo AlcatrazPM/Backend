@@ -1,5 +1,5 @@
 use crate::authenticator_control::authenticator;
-use crate::jwt::{get_claim, ApiKey, ResponseJWT, JWT};
+use jwt::jwt::{get_claim, ApiKey, ResponseJWT, JWT};
 use rocket::http::Status;
 use rocket::response::Responder;
 use rocket::{Request, Response};
