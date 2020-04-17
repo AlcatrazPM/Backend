@@ -3,13 +3,15 @@ use chrono::{Duration, Utc};
 // use rocket::request::{self, FromRequest, Request};
 // use rocket::Outcome;
 use serde::{Serialize};
-use userdata::userdata::{AuthCodes, DatabaseUser};
+use userdata::userdata::AuthCodes;
+
 
 extern crate jsonwebtoken;
 
 use self::jsonwebtoken::{encode, Header};
 use std::env;
 use crate::claim::{Claim, get_claim};
+use dataprovider::data_structs::DatabaseUser;
 
 pub static JWT_KEY: &str = "very_secret";
 

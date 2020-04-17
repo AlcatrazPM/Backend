@@ -1,8 +1,8 @@
 use mongodb::Error;
 
-use userdata::userdata::{AuthCodes, DatabaseUser, ParsedChangeAcctData, UserCredentials};
+use userdata::userdata::{AuthCodes, ParsedChangeAcctData, UserCredentials};
 use crate::utils;
-use crate::data_structs::UserId;
+use crate::data_structs::{UserId, DatabaseUser};
 
 
 pub fn get_user(id: UserId) -> Result<Option<DatabaseUser>, Error> {

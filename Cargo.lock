@@ -28,7 +28,7 @@ dependencies = [
 
 [[package]]
 name = "authenticator"
-version = "0.3.2"
+version = "1.0.0"
 dependencies = [
  "bson",
  "chrono",
@@ -194,7 +194,7 @@ checksum = "11c0346158a19b3627234e15596f5e465c360fcdb97d817bcb255e0510f5a788"
 
 [[package]]
 name = "dataprovider"
-version = "0.2.0"
+version = "1.0.0"
 dependencies = [
  "bson",
  "chrono",
@@ -450,9 +450,10 @@ dependencies = [
 
 [[package]]
 name = "jwt"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "chrono",
+ "dataprovider",
  "jsonwebtoken",
  "rocket",
  "serde",
@@ -1296,7 +1297,7 @@ dependencies = [
 
 [[package]]
 name = "userdata"
-version = "0.2.0"
+version = "1.0.0"
 dependencies = [
  "bson",
  "serde",

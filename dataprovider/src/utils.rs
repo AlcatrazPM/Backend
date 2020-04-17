@@ -6,7 +6,8 @@ use chrono::Utc;
 use mongodb::coll::Collection;
 use std::env;
 use std::str::FromStr;
-use userdata::userdata::{DatabaseUser, UserCredentials};
+use userdata::userdata::UserCredentials;
+use crate::data_structs::DatabaseUser;
 
 static AUTH_DB: &str = "localhost:27017";
 

@@ -1,6 +1,6 @@
 [package]
 name = "authenticator"
-version = "0.3.2"
+version = "1.0.0"
 authors = ["Adrian Scrab <adrian.scrab@pm.me>"]
 edition = "2018"
 

@@ -55,22 +55,11 @@ pub enum AuthCodes {
     LoginOk,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct DatabaseUser {
-    #[serde(rename = "_id")]
-    pub id: bson::oid::ObjectId,
-    pub email: String,
-    pub name: String,
-    pub date: String,
-    pub session_timer: i64,
-    pub credential: String,
-    pub e_dek: String,
-    pub i_kek: String,
-}
+
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SiteAccount {
-    pub(crate) pass: String,
-    pub(crate) site: String,
-    pub(crate) user: String,
+    pub pass: String,
+    pub site: String,
+    pub user: String,
 }

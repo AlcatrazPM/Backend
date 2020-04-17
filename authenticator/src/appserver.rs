@@ -21,8 +21,8 @@ impl AppServer {
                 ],
             )
             .register(catchers![
-                controller::unregistered_user,
                 controller::already_registered,
+                controller::unregistered_user,
             ])
             .launch();
     }
