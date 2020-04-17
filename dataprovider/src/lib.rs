@@ -10,5 +10,5 @@ mod tests {
 extern crate bson;
 
 pub mod data_structs;
-mod utils;
 pub mod primary_data_provider;
+mod utils;

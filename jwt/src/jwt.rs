@@ -2,16 +2,15 @@ use chrono::{Duration, Utc};
 // use rocket::http::Status;
 // use rocket::request::{self, FromRequest, Request};
 // use rocket::Outcome;
-use serde::{Serialize};
+use serde::Serialize;
 use userdata::userdata::AuthCodes;
-
 
 extern crate jsonwebtoken;
 
 use self::jsonwebtoken::{encode, Header};
-use std::env;
-use crate::claim::{Claim, get_claim};
+use crate::claim::{get_claim, Claim};
 use dataprovider::data_structs::DatabaseUser;
+use std::env;
 
 pub static JWT_KEY: &str = "very_secret";
 

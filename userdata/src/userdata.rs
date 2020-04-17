@@ -55,8 +55,6 @@ pub enum AuthCodes {
     LoginOk,
 }
 
-
-
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SiteAccount {
     pub pass: String,

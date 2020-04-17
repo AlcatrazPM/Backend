@@ -1,7 +1,7 @@
-use rocket::request::FromRequest;
-use rocket::{Request, request, Outcome};
-use rocket::http::Status;
 use crate::jwt::is_valid;
+use rocket::http::Status;
+use rocket::request::FromRequest;
+use rocket::{request, Outcome, Request};
 
 #[derive(Debug)]
 pub struct ApiKey {

@@ -12,6 +12,7 @@ rocket = { version = "0.4.4", optional=false }
 mongodb = "0.3.12"
 bson = "0.13.0"
 chrono = "0.4.11"
+rocket_cors = "0.5.2"
 
 userdata = { path = "../userdata" }
 dataprovider = { path = "../dataprovider" }

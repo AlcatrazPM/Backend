@@ -1,9 +1,8 @@
 use mongodb::Error;
 
-use userdata::userdata::{AuthCodes, ParsedChangeAcctData, UserCredentials};
+use crate::data_structs::{DatabaseUser, UserId};
 use crate::utils;
-use crate::data_structs::{UserId, DatabaseUser};
-
+use userdata::userdata::{AuthCodes, ParsedChangeAcctData, UserCredentials};
 
 pub fn get_user(id: UserId) -> Result<Option<DatabaseUser>, Error> {
     let coll = utils::connect()?;
@@ -51,8 +50,6 @@ pub fn insert_user(user: UserCredentials) -> Result<bool, Error> {
     Ok(true)
 }
 
-
-
 pub fn change_password(user: UserCredentials, new_password: String) -> Result<AuthCodes, Error> {
     let mut user = match get_user(UserId::Email(user.email)) {
         Ok(Some(u)) => u,
@@ -96,7 +93,3 @@ pub fn change_account_data(
         Err(e) => Err(e),
     }
 }
-
-
-
-

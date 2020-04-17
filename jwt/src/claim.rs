@@ -1,9 +1,9 @@
 use chrono::{DateTime, Utc};
-use std::env;
 use jsonwebtoken::{decode, Validation};
+use std::env;
 
-use serde::{Deserialize, Serialize};
 use crate::jwt::JWT_KEY;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Claim {
@@ -78,7 +78,7 @@ mod jwt_numeric_date {
         use super::super::jsonwebtoken::{decode, encode, Header, Validation};
         use super::super::{Claims, SECRET};
         use chrono::{TimeZone, Utc};
-        use jsonwebtoken::{encode, Header, decode, Validation};
+        use jsonwebtoken::{decode, encode, Header, Validation};
 
         #[test]
         fn round_trip() {

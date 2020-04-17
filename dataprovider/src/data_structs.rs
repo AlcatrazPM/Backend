@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct DatabaseUser {
     #[serde(rename = "_id")]

@@ -1,16 +1,15 @@
 use mongodb::db::ThreadedDatabase;
 use mongodb::{Client, Error, ThreadedClient};
 
+use crate::data_structs::DatabaseUser;
 use bson::ordered::OrderedDocument;
 use chrono::Utc;
 use mongodb::coll::Collection;
 use std::env;
 use std::str::FromStr;
 use userdata::userdata::UserCredentials;
-use crate::data_structs::DatabaseUser;
 
 static AUTH_DB: &str = "localhost:27017";
-
 
 pub(crate) fn parse_db_env_var(env: &str) -> (String, u16) {
     let db = match env::var(env) {
