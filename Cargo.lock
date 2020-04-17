@@ -28,7 +28,7 @@ dependencies = [
 
 [[package]]
 name = "authenticator"
-version = "0.3.0"
+version = "0.3.2"
 dependencies = [
  "bson",
  "chrono",
@@ -194,7 +194,14 @@ checksum = "11c0346158a19b3627234e15596f5e465c360fcdb97d817bcb255e0510f5a788"
 
 [[package]]
 name = "dataprovider"
-version = "0.1.0"
+version = "0.2.0"
+dependencies = [
+ "bson",
+ "chrono",
+ "mongodb",
+ "serde",
+ "userdata",
+]
 
 [[package]]
 name = "devise"

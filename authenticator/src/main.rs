@@ -3,14 +3,10 @@
 #[macro_use]
 extern crate rocket;
 
-#[macro_use(bson, doc)]
-extern crate bson;
-
 use crate::appserver::AppServer;
 
 mod appserver;
 mod authenticator_control;
-mod dataprovider;
 
 fn main() {
     AppServer::run();

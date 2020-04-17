@@ -1,6 +1,4 @@
-use crate::dataprovider::primary_data_provider::{
-    change_account_data, change_password, get_user, insert_user, UserId,
-};
+use dataprovider::primary_data_provider::{change_account_data, change_password, get_user, insert_user};
 use jwt::jwt::{generate_jwt, JWT};
 use jwt::claim::Claim;
 use std::str::FromStr;
@@ -8,6 +6,7 @@ use userdata::userdata::{
     AuthCodes, ChangeAcctData, ChangePassword, LoginCredentials, ParsedChangeAcctData,
     UserCredentials,
 };
+use dataprovider::data_structs::UserId;
 
 #[allow(dead_code)]
 pub fn register(user: UserCredentials) -> AuthCodes {
