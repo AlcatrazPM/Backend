@@ -7,3 +7,5 @@ mod tests {
 }
 
 pub mod jwt;
+pub mod apikey;
+pub mod claim;
