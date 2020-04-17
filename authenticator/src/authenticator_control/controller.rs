@@ -1,10 +1,12 @@
 use crate::authenticator_control::authenticator;
-use crate::jwt::{ApiKey, ResponseJWT, JWT, get_claim};
-use crate::userdata::{AuthCodes, ChangePassword, UserCredentials, LoginCredentials, ChangeAcctData};
+use crate::jwt::{get_claim, ApiKey, ResponseJWT, JWT};
 use rocket::http::Status;
 use rocket::response::Responder;
 use rocket::{Request, Response};
 use rocket_contrib::json::Json;
+use userdata::userdata::{
+    AuthCodes, ChangeAcctData, ChangePassword, LoginCredentials, UserCredentials,
+};
 
 #[post("/register", data = "<credentials>")]
 pub fn register(credentials: Json<UserCredentials>) -> Status {

@@ -12,7 +12,6 @@ mod appserver;
 mod authenticator_control;
 mod dataprovider;
 mod jwt;
-mod userdata;
 
 fn main() {
     AppServer::run();

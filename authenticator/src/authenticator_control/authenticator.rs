@@ -1,7 +1,12 @@
-use crate::dataprovider::primary_data_provider::{change_password, get_user, insert_user, change_account_data, UserId};
-use crate::jwt::{generate_jwt, JWT, Claim};
-use crate::userdata::{AuthCodes, ChangePassword, UserCredentials, LoginCredentials, ChangeAcctData, ParsedChangeAcctData};
+use crate::dataprovider::primary_data_provider::{
+    change_account_data, change_password, get_user, insert_user, UserId,
+};
+use crate::jwt::{generate_jwt, Claim, JWT};
 use std::str::FromStr;
+use userdata::userdata::{
+    AuthCodes, ChangeAcctData, ChangePassword, LoginCredentials, ParsedChangeAcctData,
+    UserCredentials,
+};
 
 #[allow(dead_code)]
 pub fn register(user: UserCredentials) -> AuthCodes {
@@ -65,8 +70,8 @@ pub fn modify_acct_data(data: ChangeAcctData, claim: Claim) -> AuthCodes {
                 Err(_) => return AuthCodes::InternalError,
             };
             ParsedChangeAcctData::SessionTimer(timer)
-        },
-        _ => return AuthCodes::InternalError
+        }
+        _ => return AuthCodes::InternalError,
     };
 
     println!("parsed data is: {:?}", parsed_data);

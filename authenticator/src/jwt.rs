@@ -1,9 +1,9 @@
-use crate::userdata::{AuthCodes, DatabaseUser};
 use chrono::{DateTime, Duration, Utc};
 use rocket::http::Status;
 use rocket::request::{self, FromRequest, Request};
 use rocket::Outcome;
 use serde::{Deserialize, Serialize};
+use userdata::userdata::{AuthCodes, DatabaseUser};
 
 extern crate jsonwebtoken;
 
@@ -95,10 +95,9 @@ pub fn is_valid(jwt: &str) -> bool {
     }
 }
 
-
 #[derive(Debug)]
 pub struct ApiKey {
-    pub key: String
+    pub key: String,
 }
 
 #[derive(Debug)]
@@ -117,7 +116,9 @@ impl<'a, 'r> FromRequest<'a, 'r> for ApiKey {
 
         match keys.len() {
             0 => Outcome::Failure((Status::BadRequest, ApiKeyError::Missing)),
-            1 if is_valid(keys[0]) => Outcome::Success(ApiKey{key: keys[0].to_string()}),
+            1 if is_valid(keys[0]) => Outcome::Success(ApiKey {
+                key: keys[0].to_string(),
+            }),
             1 => Outcome::Failure((Status::Forbidden, ApiKeyError::Invalid)),
             _ => Outcome::Failure((Status::Forbidden, ApiKeyError::BadCount)),
         }

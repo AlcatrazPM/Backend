@@ -1,0 +1,8 @@
+[workspace]
+
+members = [
+    "authenticator",
+    "dataprovider",
+    "userdata",
+    "jwt",
+]

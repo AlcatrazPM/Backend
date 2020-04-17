@@ -1,12 +1,12 @@
 use mongodb::db::ThreadedDatabase;
 use mongodb::{Client, Error, ThreadedClient};
 
-use crate::userdata::{AuthCodes, DatabaseUser, UserCredentials, ParsedChangeAcctData};
+use bson::ordered::OrderedDocument;
 use chrono::Utc;
 use mongodb::coll::Collection;
 use std::env;
 use std::str::FromStr;
-use bson::ordered::OrderedDocument;
+use userdata::userdata::{AuthCodes, DatabaseUser, ParsedChangeAcctData, UserCredentials};
 
 static AUTH_DB: &str = "localhost:27017";
 
@@ -57,8 +57,7 @@ fn connect() -> Result<Collection, Error> {
 pub fn get_user(id: UserId) -> Result<Option<DatabaseUser>, Error> {
     let coll = connect()?;
 
-
-    let filter = match  id {
+    let filter = match id {
         UserId::ObjectId(oid) => doc! { "_id": oid },
         UserId::Email(email) => doc! { "email" => email },
     };
@@ -132,7 +131,10 @@ pub fn change_password(user: UserCredentials, new_password: String) -> Result<Au
     }
 }
 
-pub fn change_account_data(id: bson::oid::ObjectId, data: ParsedChangeAcctData) -> Result<AuthCodes, Error> {
+pub fn change_account_data(
+    id: bson::oid::ObjectId,
+    data: ParsedChangeAcctData,
+) -> Result<AuthCodes, Error> {
     let mut user = match get_user(UserId::ObjectId(id.clone())) {
         Ok(Some(u)) => u,
         Ok(None) => return Ok(AuthCodes::UnregisteredUser),
@@ -162,7 +164,7 @@ fn build_db_user(user: UserCredentials) -> Result<DatabaseUser, Error> {
         id: bson::oid::ObjectId::new()?,
         email: user.email,
         name: user.name,
-        session_timer: 15,      // default timer
+        session_timer: 15, // default timer
         credential: user.password,
         date: Utc::now().to_string(),
         // e_dek: "SuchSecurity".to_string(),
@@ -171,7 +173,6 @@ fn build_db_user(user: UserCredentials) -> Result<DatabaseUser, Error> {
         i_kek: user.i_kek,
     })
 }
-
 
 pub enum UserId {
     ObjectId(bson::oid::ObjectId),
