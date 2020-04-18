@@ -85,7 +85,13 @@ All information to and from the backend will be given in JSON format. I suggest 
    Content-Length: <body-length>
    <any other fields>
    
-   { "jwt": "<token>" }
+   { 
+        "name": "Placeholder Dorel",
+        "session_timer": 15,
+        "e_dek": "SuchSecurity",
+        "i_kek": "MuchEncryption",
+        "jwt": "<token>" 
+   }
    ```
   
 3. Modify Master Password
@@ -136,7 +142,7 @@ All information to and from the backend will be given in JSON format. I suggest 
 5. Get Accounts List (**Not Implemented**)
     - Request will be:
     ```
-    POST /getaccounts HTTP/1.1
+    GET /accounts HTTP/1.1
     Authorization: Bearer <jwt_token>
     <any other fields>
     ```
@@ -171,7 +177,7 @@ All information to and from the backend will be given in JSON format. I suggest 
 6. Add/Remove/Modify Account Information (**Not Implemented**)
     - Request will be: 
     ```
-   POST /modifyaccount HTTP/1.1
+   PUT /modifyaccount HTTP/1.1
    Authorization: Bearer <jwt_token>
    <any other fields>
    

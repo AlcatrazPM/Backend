@@ -3,11 +3,11 @@ use dataprovider::primary_data_provider::{
     change_account_data, change_password, get_user, insert_user,
 };
 use jwt::claim::Claim;
-use jwt::jwt::{generate_jwt, JWT};
+use jwt::jwt::generate_jwt;
 use std::str::FromStr;
 use userdata::userdata::{
-    AuthCodes, ChangeAcctData, ChangePassword, LoginCredentials, ParsedChangeAcctData,
-    UserCredentials,
+    AuthCodes, ChangeAcctData, ChangePassword, Login, LoginCredentials, LoginResponse,
+    ParsedChangeAcctData, UserCredentials,
 };
 
 #[allow(dead_code)]
@@ -19,20 +19,43 @@ pub fn register(user: UserCredentials) -> AuthCodes {
     }
 }
 
-pub fn login(user: LoginCredentials) -> JWT {
-    match get_user(UserId::Email(user.email)) {
-        Ok(Some(db_user)) => {
-            if db_user.credential == user.password {
-                return JWT::JWT(match generate_jwt(db_user) {
-                    Some(jwt) => jwt,
-                    None => return JWT::Error(AuthCodes::InternalError),
-                });
-            }
-            JWT::Error(AuthCodes::BadPassword)
-        }
-        Ok(None) => JWT::Error(AuthCodes::UnregisteredUser),
-        Err(_) => JWT::Error(AuthCodes::DatabaseError),
-    }
+pub fn login(user: LoginCredentials) -> Login {
+    // TODO: logic
+    // unimplemented!()
+
+    let db_user = match get_user(UserId::Email(user.email)) {
+        Ok(Some(usr)) if usr.credential == user.password => usr,
+        Ok(Some(_)) => return Login::Error(AuthCodes::BadPassword),
+        Ok(None) => return Login::Error(AuthCodes::InternalError),
+        Err(_) => return Login::Error(AuthCodes::DatabaseError),
+    };
+
+    let jwt = match generate_jwt(&db_user) {
+        Some(jwt) => jwt,
+        None => return Login::Error(AuthCodes::InternalError),
+    };
+
+    Login::Login(LoginResponse {
+        name: db_user.name,
+        session_timer: db_user.session_timer,
+        e_dek: db_user.e_dek,
+        i_kek: db_user.i_kek,
+        jwt,
+    })
+
+    // match get_user(UserId::Email(user.email)) {
+    //     Ok(Some(db_user)) => {
+    //         if db_user.credential == user.password {
+    //             return JWT::JWT(match generate_jwt(db_user) {
+    //                 Some(jwt) => jwt,
+    //                 None => return JWT::Error(AuthCodes::InternalError),
+    //             });
+    //         }
+    //         JWT::Error(AuthCodes::BadPassword)
+    //     }
+    //     Ok(None) => JWT::Error(AuthCodes::UnregisteredUser),
+    //     Err(_) => JWT::Error(AuthCodes::DatabaseError),
+    // }
 }
 
 #[allow(dead_code)]

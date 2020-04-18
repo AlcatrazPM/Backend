@@ -18,6 +18,21 @@ pub struct LoginCredentials {
     pub password: String,
 }
 
+#[derive(Debug, Serialize)]
+pub struct LoginResponse {
+    pub name: String,
+    pub session_timer: i64,
+    pub e_dek: String,
+    pub i_kek: String,
+    pub jwt: String,
+}
+
+#[derive(Debug, Serialize)]
+pub enum Login {
+    Login(LoginResponse),
+    Error(AuthCodes),
+}
+
 #[derive(Debug, Deserialize)]
 // #[serde(rename_all = "PascalCase")]
 pub struct ChangePassword {
@@ -41,7 +56,7 @@ pub enum ParsedChangeAcctData {
 }
 
 #[allow(dead_code)]
-#[derive(PartialEq)]
+#[derive(PartialEq, Serialize, Debug)]
 pub enum AuthCodes {
     NotImplemented,
     DatabaseError,

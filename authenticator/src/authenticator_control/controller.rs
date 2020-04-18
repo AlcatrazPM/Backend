@@ -1,13 +1,13 @@
 use crate::authenticator_control::authenticator;
 use jwt::apikey::ApiKey;
 use jwt::claim::get_claim;
-use jwt::jwt::{ResponseJWT, JWT};
 use rocket::http::Status;
 use rocket::response::Responder;
 use rocket::{Request, Response};
 use rocket_contrib::json::Json;
+use userdata::userdata::Login;
 use userdata::userdata::{
-    AuthCodes, ChangeAcctData, ChangePassword, LoginCredentials, UserCredentials,
+    AuthCodes, ChangeAcctData, ChangePassword, LoginCredentials, LoginResponse, UserCredentials,
 };
 
 #[post("/register", data = "<credentials>")]
@@ -17,31 +17,30 @@ pub fn register(credentials: Json<UserCredentials>) -> Status {
 }
 
 #[post("/login", data = "<credentials>")]
-pub fn login(credentials: Json<LoginCredentials>) -> Result<Json<ResponseJWT>, Status> {
-    // println!("{}", format!("Your login data is: {:?}", credentials));
+pub fn login(credentials: Json<LoginCredentials>) -> Result<Json<LoginResponse>, Status> {
+    println!("{}", format!("Your login data is: {:?}", credentials));
     match authenticator::login(credentials.0) {
-        JWT::JWT(jwt) => Ok(Json(ResponseJWT { jwt })),
-        JWT::Error(code) => Err(handle_code(code)),
+        Login::Login(response) => Ok(Json(response)),
+        Login::Error(code) => Err(handle_code(code)),
     }
 }
 
 #[post("/modifypassword", data = "<credentials>")]
 pub fn modify_password(credentials: Json<ChangePassword>, key: ApiKey) -> Status {
-    println!("{}", format!("Your modified data is: {:?}", credentials));
+    println!("{}", format!("Your modified password data is: {:?}", credentials));
     println!("{}", format!("Your api key is: {:?}", key));
     handle_code(authenticator::modify_password(credentials.0))
 }
 
 #[post("/modifyacctdata", data = "<data>")]
 pub fn modify_account_data(data: Json<ChangeAcctData>, key: ApiKey) -> Status {
-    // TODO: Get Claim from ApiKey
+    // println!("{}", format!("Your modified password data is: {:?}", credentials));
     let claim = match get_claim(key.key.as_str()) {
         Some(data) => data,
         None => return Status::InternalServerError,
     };
 
     handle_code(authenticator::modify_acct_data(data.0, claim))
-    // unimplemented!()
 }
 
 #[catch(499)]

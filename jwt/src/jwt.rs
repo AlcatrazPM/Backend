@@ -2,8 +2,8 @@ use chrono::{Duration, Utc};
 // use rocket::http::Status;
 // use rocket::request::{self, FromRequest, Request};
 // use rocket::Outcome;
-use serde::Serialize;
-use userdata::userdata::AuthCodes;
+// use serde::Serialize;
+// use userdata::userdata::AuthCodes;
 
 extern crate jsonwebtoken;
 
@@ -14,17 +14,7 @@ use std::env;
 
 pub static JWT_KEY: &str = "very_secret";
 
-pub enum JWT {
-    JWT(String),
-    Error(AuthCodes),
-}
-
-#[derive(Debug, Serialize)]
-pub struct ResponseJWT {
-    pub jwt: String,
-}
-
-pub fn generate_jwt(user: DatabaseUser) -> Option<String> {
+pub fn generate_jwt(user: &DatabaseUser) -> Option<String> {
     let secret = match env::var("KEY") {
         Ok(val) => val,
         Err(_) => {
