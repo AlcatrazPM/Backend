@@ -1,9 +1,4 @@
 use chrono::{Duration, Utc};
-// use rocket::http::Status;
-// use rocket::request::{self, FromRequest, Request};
-// use rocket::Outcome;
-// use serde::Serialize;
-// use userdata::userdata::AuthCodes;
 
 extern crate jsonwebtoken;
 
@@ -23,7 +18,6 @@ pub fn generate_jwt(user: &DatabaseUser) -> Option<String> {
         }
     };
     println!("secret is {}", secret);
-    // println!("_id is {}, serialize: {} and as deserialize: {}", user.id, user.id.to_hex(), bson::oid::ObjectId);
 
     let claim = Claim {
         // exp: (Utc::now() + Duration::minutes(1)),

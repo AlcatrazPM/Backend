@@ -34,7 +34,7 @@ pub fn modify_password(credentials: Json<ChangePassword>, key: ApiKey) -> Status
 
 #[post("/modifyacctdata", data = "<data>")]
 pub fn modify_account_data(data: Json<ChangeAcctData>, key: ApiKey) -> Status {
-    // println!("{}", format!("Your modified password data is: {:?}", credentials));
+    println!("{}", format!("Your modified password data is: {:?}", data));
     let claim = match get_claim(key.key.as_str()) {
         Some(data) => data,
         None => return Status::InternalServerError,

@@ -1,5 +1,4 @@
 use crate::authenticator_control::controller;
-// use rocket_cors::{Error, Cors};
 
 pub struct AppServer;
 

@@ -20,13 +20,10 @@ pub fn register(user: UserCredentials) -> AuthCodes {
 }
 
 pub fn login(user: LoginCredentials) -> Login {
-    // TODO: logic
-    // unimplemented!()
-
     let db_user = match get_user(UserId::Email(user.email)) {
         Ok(Some(usr)) if usr.credential == user.password => usr,
         Ok(Some(_)) => return Login::Error(AuthCodes::BadPassword),
-        Ok(None) => return Login::Error(AuthCodes::InternalError),
+        Ok(None) => return Login::Error(AuthCodes::UnregisteredUser),
         Err(_) => return Login::Error(AuthCodes::DatabaseError),
     };
 
@@ -42,20 +39,6 @@ pub fn login(user: LoginCredentials) -> Login {
         i_kek: db_user.i_kek,
         jwt,
     })
-
-    // match get_user(UserId::Email(user.email)) {
-    //     Ok(Some(db_user)) => {
-    //         if db_user.credential == user.password {
-    //             return JWT::JWT(match generate_jwt(db_user) {
-    //                 Some(jwt) => jwt,
-    //                 None => return JWT::Error(AuthCodes::InternalError),
-    //             });
-    //         }
-    //         JWT::Error(AuthCodes::BadPassword)
-    //     }
-    //     Ok(None) => JWT::Error(AuthCodes::UnregisteredUser),
-    //     Err(_) => JWT::Error(AuthCodes::DatabaseError),
-    // }
 }
 
 #[allow(dead_code)]
