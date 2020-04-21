@@ -174,7 +174,7 @@ All information to and from the backend will be given in JSON format. I suggest 
     
     ```
    
-6. Add/Remove/Modify Account Information (**Not Implemented**)
+6. Add/Modify Account Information (**Not Implemented**)
     - Request will be: 
     ```
    PUT /modifyaccount HTTP/1.1
@@ -182,24 +182,46 @@ All information to and from the backend will be given in JSON format. I suggest 
    <any other fields>
    
    {
-       "operation": "add",
-       "site": {
-           "id": "random_string"
-           "site": "bestnsfwsite.com"
-           "username": "genericuser@emailclient.com",
-           "password": "nohackerpls",
-           "favourite": false
-       }
+       "id": "random_string"
+       "site": "bestnsfwsite.com"
+       "username": "genericuser@emailclient.com",
+       "password": "nohackerpls",
+       "favourite": false
    }
    ```
-   The `Action` field can be: `add`, `remove`, `modifiy`. Any of the fields in the `site` parameter can be changed for `modify` apart from `id`.
-   - Response will be: 
+   - Response for **adding new account** will be: 
    ```
-   HTTP/1.1 200 OK
+   HTTP/1.1 201 Created
    <any other fields>
    ```
+   - Response for **modifying account info** will be: 
+    ```
+    HTTP/1.1 200 OK
+    <any other fields>
+    ```
+   
+7. Delete Account Information (**Not Implemented**)
+   - Request will be: 
+   ```
+   DELETE /modifyaccount HTTP/1.1
+   Authorization: Bearer <jwt_token>
+   <any other fields>
+  
+   {
+        "id": "random_string"
+        "site": "bestnsfwsite.com"
+        "username": "genericuser@emailclient.com",
+        "password": "nohackerpls",
+        "favourite": false
+   }
+   ```
+    - Response will be: 
+    ```
+    HTTP/1.1 200 OK
+    <any other fields>
+    ```
     
-7. Error Responses
+8. Error Responses
     - Incorrect Body Format
     ```
     HTTP/1.1 400 Bad Request

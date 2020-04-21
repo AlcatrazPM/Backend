@@ -34,8 +34,8 @@ pub fn get_claim(jwt: &str) -> Option<Claim> {
 
     let token = match decoded {
         Ok(token) => token,
-        Err(_) => {
-            println!("Incorrect jwt");
+        Err(e) => {
+            println!("Incorrect jwt {:?}", e);
             return None;
         }
     };

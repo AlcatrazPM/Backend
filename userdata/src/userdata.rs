@@ -72,7 +72,29 @@ pub enum AuthCodes {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SiteAccount {
-    pub pass: String,
+    pub id: String,
     pub site: String,
-    pub user: String,
+    pub username: String,
+    pub password: String,
+    pub favourite: bool,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct AccountsList {
+    pub accounts: Vec<SiteAccount>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum Accounts {
+    Accounts(AccountsList),
+    Error(AcctCodes),
+}
+
+#[allow(dead_code)]
+#[derive(PartialEq, Serialize, Debug)]
+pub enum AcctCodes {
+    NotImplemented,
+    DatabaseError,
+    InternalError,
+    ChangedData,
 }

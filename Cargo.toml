@@ -2,6 +2,7 @@
 
 members = [
     "authenticator",
+    "accountsprovider",
     "dataprovider",
     "userdata",
     "jwt",
