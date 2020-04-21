@@ -1,17 +1,19 @@
 use mongodb::Error;
 
-use crate::data_structs::{DatabaseUser, UserId};
+use crate::data_structs::{DatabaseUser, UserId, DatabaseAccountEntry};
 use crate::utils;
 use userdata::userdata::{AuthCodes, ParsedChangeAcctData, UserCredentials};
+use crate::utils::DB;
 
 pub fn get_user(id: UserId) -> Result<Option<DatabaseUser>, Error> {
-    let coll = utils::connect()?;
+    let coll = utils::connect(DB::Auth)?;
 
     let filter = match id {
         UserId::ObjectId(oid) => doc! { "_id": oid },
         UserId::Email(email) => doc! { "email" => email },
     };
 
+    println!("filter is: {:?}", filter);
     let result = coll.find_one(Some(filter), None);
 
     let user = match result {
@@ -31,7 +33,7 @@ pub fn get_user(id: UserId) -> Result<Option<DatabaseUser>, Error> {
 }
 
 pub fn insert_user(user: UserCredentials) -> Result<bool, Error> {
-    let coll = utils::connect()?;
+    let coll = utils::connect(DB::Auth)?;
     if let Ok(Some(_)) = get_user(UserId::Email(user.email.clone())) {
         return Ok(false);
     }
@@ -69,7 +71,8 @@ pub fn change_password(user: UserCredentials, new_password: String) -> Result<Au
 pub fn change_account_data(
     id: bson::oid::ObjectId,
     data: ParsedChangeAcctData,
-) -> Result<AuthCodes, Error> {
+) -> Result<AuthCodes, Error>
+{
     let mut user = match get_user(UserId::ObjectId(id.clone())) {
         Ok(Some(u)) => u,
         Ok(None) => return Ok(AuthCodes::UnregisteredUser),
@@ -92,4 +95,37 @@ pub fn change_account_data(
         Ok(_) => Ok(AuthCodes::ChangedData),
         Err(e) => Err(e),
     }
+}
+
+pub fn get_accounts_list(id: UserId) -> Result<Option<DatabaseAccountEntry>, Error> {
+    // match debug_list_all() {
+    //     Err(e) => println!("Error at debug: {:?}", e),
+    //     _ => {},
+    // }
+    let coll = utils::connect(DB::Acct)?;
+
+    let filter = match id {
+        UserId::ObjectId(oid) => doc! { "userid": oid },
+        UserId::Email(email) => return Err(mongodb::Error::ArgumentError("wrong id".to_string()))
+    };
+
+    println!("filter is: {:?}", filter);
+    let result = coll.find_one(Some(filter), None);
+
+    let entry = match result {
+        Ok(maybe_doc) => match maybe_doc {
+            Some(doc) => doc,
+            None => {
+                println!("~No entry found");
+                return Ok(None);
+            }
+        },
+        Err(e) => return Err(e),
+    };
+
+    println!("document found is: {:?}", entry);
+    let entry: DatabaseAccountEntry = bson::from_bson(bson::Bson::Document(entry))?;
+    println!("~Database found entry: {:?}", entry.userid);
+
+    Ok(Some(entry))
 }

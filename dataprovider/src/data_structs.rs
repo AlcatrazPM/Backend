@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use userdata::userdata::SiteAccount;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct DatabaseUser {
@@ -16,4 +17,23 @@ pub struct DatabaseUser {
 pub enum UserId {
     ObjectId(bson::oid::ObjectId),
     Email(String),
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct DatabaseAccountEntry {
+    #[serde(rename = "_id")]
+    pub id: bson::oid::ObjectId,
+    pub userid: bson::oid::ObjectId,
+    pub entries: Vec<DatabaseSiteAccount>,
+    pub clear_entries: Vec<DatabaseSiteAccount>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct DatabaseSiteAccount {
+    #[serde(rename = "_id")]
+    pub id: bson::oid::ObjectId,
+    pub site: String,
+    pub username: String,
+    pub password: String,
+    pub favorite: bool,
 }

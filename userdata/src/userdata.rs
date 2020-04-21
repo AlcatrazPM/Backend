@@ -76,7 +76,7 @@ pub struct SiteAccount {
     pub site: String,
     pub username: String,
     pub password: String,
-    pub favourite: bool,
+    pub favorite: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -91,10 +91,11 @@ pub enum Accounts {
 }
 
 #[allow(dead_code)]
-#[derive(PartialEq, Serialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum AcctCodes {
     NotImplemented,
     DatabaseError,
     InternalError,
     ChangedData,
+    NoSuchUser,
 }

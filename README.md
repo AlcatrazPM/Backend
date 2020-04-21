@@ -38,6 +38,8 @@ Variables that can be set are:
 
 3. Database Location which has key `AUTH_DB` for the **authenticator** and `ACCT_DB` for the **accountsprovider**. Value is of type `<host>:<port>` where *host* is an ip or preconfigured host and *port* is a number ranging from [1, 65535].
 
+4. (Only in **accountsprovider**) `CLEAR` to signal the server to send clear entries in the responses and modify the clear entries. To be used only when debugging.
+
 **Example**: `ROCKET_ENV=dev KEY=secret AUTH_DB=localhost:27017 cargo run` will set the server to run in development mode with the encoding key 'secret' for the JWTs and the database situated at address localhost at port 27017.
 
 
@@ -139,7 +141,7 @@ All information to and from the backend will be given in JSON format. I suggest 
    
    The field `new_value` holds a string, even the session timer.
 
-5. Get Accounts List (**Not Implemented**)
+5. Get Accounts List
     - Request will be:
     ```
     GET /accounts HTTP/1.1

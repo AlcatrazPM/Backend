@@ -10,13 +10,19 @@ use std::str::FromStr;
 use userdata::userdata::UserCredentials;
 
 static AUTH_DB: &str = "localhost:27017";
+static ACCT_DB: &str = "localhost:27018";
 
 pub(crate) fn parse_db_env_var(env: &str) -> (String, u16) {
     let db = match env::var(env) {
         Ok(val) => val,
         Err(_) => {
             println!("Setting to default listening connection for MongoDB");
-            AUTH_DB.to_string()
+            match env {
+                "AUTH_DB" => AUTH_DB.to_string(),
+                "ACCT_DB" => ACCT_DB.to_string(),
+                _ => AUTH_DB.to_string(),
+            }
+            // AUTH_DB.to_string()
         }
     };
 
@@ -46,17 +52,26 @@ pub(crate) fn parse_db_env_var(env: &str) -> (String, u16) {
     (String::from(host), port)
 }
 
-pub(crate) fn connect() -> Result<Collection, Error> {
-    let (host, port): (String, u16) = parse_db_env_var("AUTH_DB");
+pub(crate) fn connect(db: DB) -> Result<Collection, Error> {
+    let db_type: &str = match db {
+        DB::Auth => "AUTH_DB",
+        DB::Acct => "ACCT_DB",
+    };
+    let (host, port): (String, u16) = parse_db_env_var(db_type);
     println!("DB is {}:{}", host, port);
 
     let client = Client::connect(host.as_str(), port)?;
 
-    Ok(client.db("alcatraz").collection("users"))
+    let coll_name: &str = match db {
+        DB::Auth => "users",
+        DB::Acct => "entries",
+    };
+
+    Ok(client.db("alcatraz").collection(coll_name))
 }
 
 pub(crate) fn update_user(user: DatabaseUser, filter: OrderedDocument) -> Result<(), Error> {
-    let coll = connect()?;
+    let coll = connect(DB::Auth)?;
 
     let serialized_user = bson::to_bson(&user)?;
     if let bson::Bson::Document(document) = serialized_user {
@@ -83,4 +98,9 @@ pub(crate) fn build_db_user(user: UserCredentials) -> Result<DatabaseUser, Error
         e_dek: user.e_dek,
         i_kek: user.i_kek,
     })
+}
+
+pub(crate) enum DB {
+    Auth,
+    Acct,
 }
