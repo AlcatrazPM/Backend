@@ -5,9 +5,9 @@ extern crate rocket;
 
 use crate::appserver::AppServer;
 
+mod accountsprovider;
 mod appserver;
 mod controller;
-mod accountsprovider;
 
 fn main() {
     AppServer::run();

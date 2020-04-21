@@ -1,9 +1,9 @@
-use rocket::http::Status;
-use jwt::apikey::ApiKey;
-use rocket_contrib::json::Json;
-use userdata::userdata::{AccountsList, AcctCodes, SiteAccount, Accounts};
-use jwt::claim::get_claim;
 use crate::accountsprovider;
+use jwt::apikey::ApiKey;
+use jwt::claim::get_claim;
+use rocket::http::Status;
+use rocket_contrib::json::Json;
+use userdata::userdata::{Accounts, AccountsList, AcctCodes, SiteAccount};
 
 #[get("/accounts")]
 pub fn get_accounts(key: ApiKey) -> Result<Json<AccountsList>, Status> {
@@ -27,13 +27,14 @@ pub fn delete_account(key: ApiKey, site: Json<SiteAccount>) -> Status {
     handle_code(AcctCodes::NotImplemented)
 }
 
-
 fn handle_code(code: AcctCodes) -> Status {
     match code {
         AcctCodes::NotImplemented => Status::NotImplemented,
         AcctCodes::DatabaseError => Status::InternalServerError,
         AcctCodes::InternalError => Status::InternalServerError,
-        AcctCodes::ChangedData => Status::Ok,
-        AcctCodes::NoSuchUser => Status::ImATeapot,
+        AcctCodes::NoSuchUser => Status::ImATeapot, // should never be accessed by my calculations
+        AcctCodes::AccountChanged => Status::Ok,
+        AcctCodes::AccountAdded => Status::Created,
+        AcctCodes::AccountDeleted => Status::Ok,
     }
 }

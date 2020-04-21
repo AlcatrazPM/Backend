@@ -27,7 +27,10 @@ pub fn login(credentials: Json<LoginCredentials>) -> Result<Json<LoginResponse>,
 
 #[post("/modifypassword", data = "<credentials>")]
 pub fn modify_password(credentials: Json<ChangePassword>, key: ApiKey) -> Status {
-    println!("{}", format!("Your modified password data is: {:?}", credentials));
+    println!(
+        "{}",
+        format!("Your modified password data is: {:?}", credentials)
+    );
     println!("{}", format!("Your api key is: {:?}", key));
     handle_code(authenticator::modify_password(credentials.0))
 }

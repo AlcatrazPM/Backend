@@ -1,9 +1,9 @@
 use mongodb::Error;
 
-use crate::data_structs::{DatabaseUser, UserId, DatabaseAccountEntry};
+use crate::data_structs::{DatabaseAccountEntry, DatabaseUser, UserId};
 use crate::utils;
-use userdata::userdata::{AuthCodes, ParsedChangeAcctData, UserCredentials};
 use crate::utils::DB;
+use userdata::userdata::{AuthCodes, ParsedChangeAcctData, UserCredentials};
 
 pub fn get_user(id: UserId) -> Result<Option<DatabaseUser>, Error> {
     let coll = utils::connect(DB::Auth)?;
@@ -71,8 +71,7 @@ pub fn change_password(user: UserCredentials, new_password: String) -> Result<Au
 pub fn change_account_data(
     id: bson::oid::ObjectId,
     data: ParsedChangeAcctData,
-) -> Result<AuthCodes, Error>
-{
+) -> Result<AuthCodes, Error> {
     let mut user = match get_user(UserId::ObjectId(id.clone())) {
         Ok(Some(u)) => u,
         Ok(None) => return Ok(AuthCodes::UnregisteredUser),
@@ -106,7 +105,7 @@ pub fn get_accounts_list(id: UserId) -> Result<Option<DatabaseAccountEntry>, Err
 
     let filter = match id {
         UserId::ObjectId(oid) => doc! { "userid": oid },
-        UserId::Email(email) => return Err(mongodb::Error::ArgumentError("wrong id".to_string()))
+        UserId::Email(email) => return Err(mongodb::Error::ArgumentError("wrong id".to_string())),
     };
 
     println!("filter is: {:?}", filter);

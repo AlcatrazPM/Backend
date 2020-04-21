@@ -96,6 +96,8 @@ pub enum AcctCodes {
     NotImplemented,
     DatabaseError,
     InternalError,
-    ChangedData,
+    AccountChanged,
+    AccountAdded,
+    AccountDeleted,
     NoSuchUser,
 }

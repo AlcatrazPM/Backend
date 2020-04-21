@@ -1,8 +1,8 @@
-use jwt::claim::Claim;
-use userdata::userdata::{Accounts, AcctCodes, SiteAccount, AccountsList};
-use dataprovider::primary_data_provider::get_accounts_list;
 use dataprovider::data_structs::UserId;
+use dataprovider::primary_data_provider::get_accounts_list;
+use jwt::claim::Claim;
 use std::env;
+use userdata::userdata::{Accounts, AccountsList, AcctCodes, SiteAccount};
 
 #[derive(Debug)]
 enum EntryType {
