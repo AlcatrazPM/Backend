@@ -2,7 +2,7 @@ use mongodb::Error;
 
 use crate::data_structs::{DatabaseAccountEntry, DatabaseUser, UserId};
 use crate::utils;
-use crate::utils::DB;
+use crate::utils::{build_db_acct, DB};
 use userdata::userdata::{AuthCodes, ParsedChangeAcctData, UserCredentials};
 
 pub fn get_user(id: UserId) -> Result<Option<DatabaseUser>, Error> {
@@ -97,15 +97,11 @@ pub fn change_account_data(
 }
 
 pub fn get_accounts_list(id: UserId) -> Result<Option<DatabaseAccountEntry>, Error> {
-    // match debug_list_all() {
-    //     Err(e) => println!("Error at debug: {:?}", e),
-    //     _ => {},
-    // }
     let coll = utils::connect(DB::Acct)?;
 
     let filter = match id {
         UserId::ObjectId(oid) => doc! { "userid": oid },
-        UserId::Email(email) => return Err(mongodb::Error::ArgumentError("wrong id".to_string())),
+        UserId::Email(_) => return Err(mongodb::Error::ArgumentError("wrong id".to_string())),
     };
 
     println!("filter is: {:?}", filter);
@@ -127,4 +123,34 @@ pub fn get_accounts_list(id: UserId) -> Result<Option<DatabaseAccountEntry>, Err
     println!("~Database found entry: {:?}", entry.userid);
 
     Ok(Some(entry))
+}
+
+pub fn create_acct_user(id: bson::oid::ObjectId) -> Result<Option<DatabaseAccountEntry>, Error> {
+    let coll = utils::connect(DB::Acct)?;
+    let entry: DatabaseAccountEntry = build_db_acct(id.clone())?;
+    println!("insert this: {:?}", entry);
+    let serialized_entry = bson::to_bson(&entry)?;
+
+    if let bson::Bson::Document(document) = serialized_entry {
+        print!("");
+        coll.insert_one(document, None)?;
+    } else {
+        println!("Error converting the BSON object into a MongoDB document");
+        return Err(mongodb::error::Error::DefaultError(
+            "converting the BSON object".to_string(),
+        ));
+    }
+
+    get_accounts_list(UserId::ObjectId(id))
+}
+
+pub fn update_accounts(accounts: DatabaseAccountEntry) -> Result<(), Error> {
+    let filter = doc! { "_id": accounts.id.clone() };
+
+    println!("filter is: {:?}", filter);
+    println!("database object is: {:?}", accounts);
+
+    utils::update_acct_user(accounts, filter)?;
+
+    Ok(())
 }

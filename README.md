@@ -2,11 +2,6 @@
 
 ![crab pet](https://i.imgur.com/LbZJgmm.gif)
 
-# Important Notice
-
-1. The backend is going in a long redesinging faze, such that the **accountsprovider** is no longer present in the repo. At the moment all effort is going to **authenticator** (full feature).
-2. The backend responses are not complete and they don't usually work in a browser due to the CORS policy. Please don't use a browser for requests at the moment. I am working on it and I am sorry for the inconvenience.
-
 # Compile & Run
 
 > [!IMPORTANT]
@@ -124,7 +119,7 @@ All information to and from the backend will be given in JSON format. I suggest 
     <any other fields>
     
     {
-        "field_name": <field_name>
+        "field_name": <field_name>,
         "new_value": <new_value>
     }      
     ```
@@ -158,25 +153,25 @@ All information to and from the backend will be given in JSON format. I suggest 
     {
         "accounts": [
             {
-                "id": "random_string1"
-                "site": "site1.com"
+                "id": "random_string1",
+                "site": "site1.com",
                 "username": "ceva1",
                 "password": "altceva2",
-                "favourite": true
+                "favorite": true
             },
             {
-                "id": "random_string2"
-                "site": "site2.com"
+                "id": "random_string2",
+                "site": "site2.com",
                 "username": "ceva2",
                 "password": "altceva1",
-                "favourite": false
+                "favorite": false
             }
         ]
     }
     
     ```
    
-6. Add/Modify Account Information (**Not Implemented**)
+6. Add/Modify Account Information
     - Request will be: 
     ```
    PUT /modifyaccount HTTP/1.1
@@ -184,11 +179,11 @@ All information to and from the backend will be given in JSON format. I suggest 
    <any other fields>
    
    {
-       "id": "random_string"
-       "site": "bestnsfwsite.com"
+       "id": "random_string",
+       "site": "bestnsfwsite.com",
        "username": "genericuser@emailclient.com",
        "password": "nohackerpls",
-       "favourite": false
+       "favorite": false
    }
    ```
    - Response for **adding new account** will be: 
@@ -202,7 +197,7 @@ All information to and from the backend will be given in JSON format. I suggest 
     <any other fields>
     ```
    
-7. Delete Account Information (**Not Implemented**)
+7. Delete Account Information
    - Request will be: 
    ```
    DELETE /modifyaccount HTTP/1.1
@@ -210,11 +205,11 @@ All information to and from the backend will be given in JSON format. I suggest 
    <any other fields>
   
    {
-        "id": "random_string"
-        "site": "bestnsfwsite.com"
+        "id": "random_string",
+        "site": "bestnsfwsite.com",
         "username": "genericuser@emailclient.com",
         "password": "nohackerpls",
-        "favourite": false
+        "favorite": false
    }
    ```
     - Response will be: 

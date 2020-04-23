@@ -1,7 +1,7 @@
 use mongodb::db::ThreadedDatabase;
 use mongodb::{Client, Error, ThreadedClient};
 
-use crate::data_structs::DatabaseUser;
+use crate::data_structs::{DatabaseAccountEntry, DatabaseUser};
 use bson::ordered::OrderedDocument;
 use chrono::Utc;
 use mongodb::coll::Collection;
@@ -26,7 +26,7 @@ pub(crate) fn parse_db_env_var(env: &str) -> (String, u16) {
         }
     };
 
-    let db: Vec<&str> = db.split(":").collect();
+    let db: Vec<&str> = db.split(':').collect();
     let host = match db.get(0) {
         Some(val) => *val,
         None => {
@@ -98,6 +98,34 @@ pub(crate) fn build_db_user(user: UserCredentials) -> Result<DatabaseUser, Error
         e_dek: user.e_dek,
         i_kek: user.i_kek,
     })
+}
+
+pub(crate) fn build_db_acct(id: bson::oid::ObjectId) -> Result<DatabaseAccountEntry, Error> {
+    Ok(DatabaseAccountEntry {
+        id: bson::oid::ObjectId::new()?,
+        userid: id,
+        entries: vec![],
+        clear_entries: vec![],
+    })
+}
+
+pub(crate) fn update_acct_user(
+    user: DatabaseAccountEntry,
+    filter: OrderedDocument,
+) -> Result<(), Error> {
+    let coll = connect(DB::Acct)?;
+
+    let serialized_user = bson::to_bson(&user)?;
+    if let bson::Bson::Document(document) = serialized_user {
+        print!("");
+        coll.replace_one(filter, document, None)?;
+    } else {
+        println!("Error converting the BSON object into a MongoDB document");
+        return Err(mongodb::error::Error::DefaultError(
+            "converting the BSON object".to_string(),
+        ));
+    }
+    Ok(())
 }
 
 pub(crate) enum DB {

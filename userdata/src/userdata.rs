@@ -90,8 +90,14 @@ pub enum Accounts {
     Error(AcctCodes),
 }
 
-#[allow(dead_code)]
 #[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum SiteAccountAction {
+    Put,
+    Delete,
+}
+
+#[allow(dead_code)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum AcctCodes {
     NotImplemented,
     DatabaseError,

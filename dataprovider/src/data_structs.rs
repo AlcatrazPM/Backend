@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use userdata::userdata::SiteAccount;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct DatabaseUser {
