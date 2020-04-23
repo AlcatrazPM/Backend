@@ -35,8 +35,5 @@ pub fn generate_jwt(user: &DatabaseUser) -> Option<String> {
 }
 
 pub fn is_valid(jwt: &str) -> bool {
-    match get_claim(jwt) {
-        Some(_) => true,
-        None => false,
-    }
+    get_claim(jwt).is_some()
 }
