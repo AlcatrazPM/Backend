@@ -65,7 +65,7 @@ fn handle_code(code: AuthCodes) -> Status {
         AuthCodes::BadPassword => Status::Unauthorized,
         AuthCodes::ChangedPassword => Status::Ok,
         AuthCodes::ChangedData => Status::Ok,
-        AuthCodes::RegisterOk => Status::Ok,
+        AuthCodes::RegisterOk => Status::Created,
         AuthCodes::LoginOk => Status::Ok,
         AuthCodes::AlreadyRegistered => Status::new(498, "Already Registered User"),
     }
