@@ -59,7 +59,7 @@ All information to and from the backend will be given in JSON format. I suggest 
     ```
     - Response will be:
     ```
-    HTTP/1.1 200 OK
+    HTTP/1.1 201 Created
     <any other fields>
     ```
 
