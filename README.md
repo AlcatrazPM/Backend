@@ -153,14 +153,14 @@ All information to and from the backend will be given in JSON format. I suggest 
     {
         "accounts": [
             {
-                "id": "random_string1",
+                "id": "<site_id1>",
                 "site": "site1.com",
                 "username": "ceva1",
                 "password": "altceva2",
                 "favorite": true
             },
             {
-                "id": "random_string2",
+                "id": "<site_id2>",
                 "site": "site2.com",
                 "username": "ceva2",
                 "password": "altceva1",
@@ -171,33 +171,48 @@ All information to and from the backend will be given in JSON format. I suggest 
     
     ```
    
-6. Add/Modify Account Information
+6. Add Account Information
     - Request will be: 
     ```
-   PUT /modifyaccount HTTP/1.1
+   PUT /addaccount HTTP/1.1
    Authorization: Bearer <jwt_token>
    <any other fields>
    
    {
-       "id": "random_string",
        "site": "bestnsfwsite.com",
        "username": "genericuser@emailclient.com",
        "password": "nohackerpls",
        "favorite": false
    }
    ```
-   - Response for **adding new account** will be: 
+   - Response will be: 
    ```
    HTTP/1.1 201 Created
    <any other fields>
    ```
-   - Response for **modifying account info** will be: 
-    ```
-    HTTP/1.1 200 OK
-    <any other fields>
-    ```
    
-7. Delete Account Information
+7. Modify Account Information
+   - Request will be: 
+   ```
+   PUT /modifyaccount HTTP/1.1
+   Authorization: Bearer <jwt_token>
+   <any other fields>
+  
+   {
+       "id": "<site_id>",
+       "site": "bestnsfwsite.com",
+       "username": "genericuser@emailclient.com",
+       "password": "nohackerpls",
+       "favorite": false
+   }
+   ```
+   - Response will be: 
+   ```
+   HTTP/1.1 200 OK
+   <any other fields>
+   ```
+   
+8. Delete Account Information
    - Request will be: 
    ```
    DELETE /modifyaccount HTTP/1.1
@@ -205,11 +220,7 @@ All information to and from the backend will be given in JSON format. I suggest 
    <any other fields>
   
    {
-        "id": "random_string",
-        "site": "bestnsfwsite.com",
-        "username": "genericuser@emailclient.com",
-        "password": "nohackerpls",
-        "favorite": false
+        "id": "<site_id>"
    }
    ```
     - Response will be: 
@@ -234,7 +245,7 @@ All information to and from the backend will be given in JSON format. I suggest 
     HTTP/1.1 403 Forbidden 
     <any other fields>
     ```
-   - Unknown request page
+   - Unknown request page / Account to modify not found
    ```
    HTTP/1.1 404 Not Found
    <any other fields>

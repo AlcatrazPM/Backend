@@ -3,7 +3,7 @@ use jwt::apikey::ApiKey;
 use jwt::claim::get_claim;
 use rocket::http::Status;
 use rocket_contrib::json::Json;
-use userdata::userdata::{Accounts, AccountsList, AcctCodes, SiteAccount, SiteAccountAction};
+use userdata::userdata::{Accounts, AccountsList, AcctCodes, AddSite, IdSite, SiteAccount};
 
 #[get("/accounts")]
 pub fn get_accounts(key: ApiKey) -> Result<Json<AccountsList>, Status> {
@@ -17,6 +17,16 @@ pub fn get_accounts(key: ApiKey) -> Result<Json<AccountsList>, Status> {
     }
 }
 
+#[put("/addaccount", data = "<site>")]
+pub fn add_account(key: ApiKey, site: Json<AddSite>) -> Status {
+    let claim = match get_claim(key.key.as_str()) {
+        Some(data) => data,
+        None => return Status::InternalServerError,
+    };
+
+    handle_code(accountsprovider::add_account(claim, site.0))
+}
+
 #[put("/modifyaccount", data = "<site>")]
 pub fn modify_account(key: ApiKey, site: Json<SiteAccount>) -> Status {
     let claim = match get_claim(key.key.as_str()) {
@@ -24,25 +34,17 @@ pub fn modify_account(key: ApiKey, site: Json<SiteAccount>) -> Status {
         None => return Status::InternalServerError,
     };
 
-    handle_code(accountsprovider::modify_account(
-        claim,
-        site.0,
-        SiteAccountAction::Put,
-    ))
+    handle_code(accountsprovider::modify_account(claim, site.0))
 }
 
 #[delete("/modifyaccount", data = "<site>")]
-pub fn delete_account(key: ApiKey, site: Json<SiteAccount>) -> Status {
+pub fn delete_account(key: ApiKey, site: Json<IdSite>) -> Status {
     let claim = match get_claim(key.key.as_str()) {
         Some(data) => data,
         None => return Status::InternalServerError,
     };
 
-    handle_code(accountsprovider::modify_account(
-        claim,
-        site.0,
-        SiteAccountAction::Delete,
-    ))
+    handle_code(accountsprovider::delete_account(claim, site.0))
 }
 
 fn handle_code(code: AcctCodes) -> Status {
@@ -54,5 +56,6 @@ fn handle_code(code: AcctCodes) -> Status {
         AcctCodes::AccountChanged => Status::Ok,
         AcctCodes::AccountAdded => Status::Created,
         AcctCodes::AccountDeleted => Status::Ok,
+        AcctCodes::AccountNotFound => Status::NotFound,
     }
 }

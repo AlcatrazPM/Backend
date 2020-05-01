@@ -2,7 +2,7 @@ use dataprovider::data_structs::{DatabaseAccountEntry, DatabaseSiteAccount, User
 use dataprovider::primary_data_provider::{create_acct_user, get_accounts_list, update_accounts};
 use jwt::claim::Claim;
 use std::env;
-use userdata::userdata::{Accounts, AccountsList, AcctCodes, SiteAccount, SiteAccountAction};
+use userdata::userdata::{Accounts, AccountsList, AcctCodes, AddSite, IdSite, SiteAccount};
 
 #[derive(Debug)]
 enum EntryType {
@@ -88,12 +88,8 @@ pub(crate) fn get_accounts(claim: Claim) -> Accounts {
     Accounts::Accounts(AccountsList { accounts })
 }
 
-pub(crate) fn modify_account(
-    claim: Claim,
-    site: SiteAccount,
-    action: SiteAccountAction,
-) -> AcctCodes {
-    println!("Action is: {:?}", site);
+pub(crate) fn add_account(claim: Claim, site: AddSite) -> AcctCodes {
+    println!("Site to add is: {:?}", site);
 
     let mut db_entry = match get_db_entry(&claim) {
         DbEntry::Entry(en) => en,
@@ -112,7 +108,7 @@ pub(crate) fn modify_account(
         EntryType::Encrypted => &mut db_entry.entries,
     };
 
-    let id = match bson::oid::ObjectId::with_string(&site.id) {
+    let id = match bson::oid::ObjectId::new() {
         Ok(id) => id,
         Err(e) => {
             println!("Error: {:?}", e);
@@ -120,51 +116,91 @@ pub(crate) fn modify_account(
         }
     };
 
-    let db_site = DatabaseSiteAccount {
-        id: id.clone(),
+    entries.push(DatabaseSiteAccount {
+        id,
         site: site.site,
         username: site.username,
         password: site.password,
         favorite: site.favorite,
+    });
+
+    if let Err(e) = update_accounts(db_entry) {
+        println!("Error: {:?}", e);
+        return AcctCodes::DatabaseError;
+    }
+    AcctCodes::AccountAdded
+}
+
+pub(crate) fn modify_account(claim: Claim, site: SiteAccount) -> AcctCodes {
+    println!("Site to modify is: {:?}", site);
+    apply_action(claim, site.id.clone(), Action::Update(site))
+}
+
+pub(crate) fn delete_account(claim: Claim, id: IdSite) -> AcctCodes {
+    println!("id to delete site is: {:?}", id);
+    apply_action(claim, id.id, Action::Delete)
+}
+
+fn apply_action(claim: Claim, id: String, action: Action) -> AcctCodes {
+    let mut db_entry = match get_db_entry(&claim) {
+        DbEntry::Entry(en) => en,
+        DbEntry::Error(code) => return code,
     };
-    //     entries.push(db_site.clone());
+    println!("db found: {:?}", db_entry);
+
+    let entry_type = match env::var("CLEAR") {
+        Ok(_) => EntryType::Clear,
+        Err(_) => EntryType::Encrypted,
+    };
+    println!("entry type is: {:?}", entry_type);
+
+    let entries = match entry_type {
+        EntryType::Clear => &mut db_entry.clear_entries,
+        EntryType::Encrypted => &mut db_entry.entries,
+    };
+
+    let search_id = match bson::oid::ObjectId::with_string(&id) {
+        Ok(id) => id,
+        Err(e) => {
+            println!("Error: {:?}", e);
+            return AcctCodes::InternalError;
+        }
+    };
+
     let mut found_idx: usize = std::usize::MAX;
     for (idx, _) in entries.iter().enumerate() {
-        if entries[idx].id.eq(&id) {
+        if entries[idx].id.eq(&search_id) {
             found_idx = idx;
             break;
         }
     }
-    let maybe_entry = entries.get_mut(found_idx);
+    let entry = match entries.get_mut(found_idx) {
+        Some(entry) => entry,
+        None => {
+            println!("No Account found");
+            return AcctCodes::AccountNotFound;
+        }
+    };
 
     match action {
-        SiteAccountAction::Put => {
-            if let Some(entry) = maybe_entry {
-                println!("Need to update");
-                *entry = db_site;
-                if let Err(e) = update_accounts(db_entry) {
-                    println!("Error: {:?}", e);
-                    return AcctCodes::DatabaseError;
-                }
-                AcctCodes::AccountChanged
-            } else {
-                println!("Need to create");
-                entries.push(db_site);
-                if let Err(e) = update_accounts(db_entry) {
-                    println!("Error: {:?}", e);
-                    return AcctCodes::DatabaseError;
-                }
-                AcctCodes::AccountAdded
+        Action::Update(site) => {
+            println!("Need to update");
+            *entry = DatabaseSiteAccount {
+                id: search_id,
+                site: site.site,
+                username: site.username,
+                password: site.password,
+                favorite: site.favorite,
+            };
+            if let Err(e) = update_accounts(db_entry) {
+                println!("Error: {:?}", e);
+                return AcctCodes::DatabaseError;
             }
+            AcctCodes::AccountChanged
         }
-        SiteAccountAction::Delete => {
-            if maybe_entry.is_some() {
-                println!("Need to delete");
-                entries.remove(found_idx);
-                // AcctCodes::AccountDeleted
-            } else {
-                println!("Nothing to delete");
-            }
+        Action::Delete => {
+            println!("Need to delete");
+            entries.remove(found_idx);
             if let Err(e) = update_accounts(db_entry) {
                 println!("Error: {:?}", e);
                 return AcctCodes::DatabaseError;
@@ -172,4 +208,9 @@ pub(crate) fn modify_account(
             AcctCodes::AccountDeleted
         }
     }
+}
+
+enum Action {
+    Update(SiteAccount),
+    Delete,
 }

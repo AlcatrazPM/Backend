@@ -71,6 +71,19 @@ pub enum AuthCodes {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct AddSite {
+    pub site: String,
+    pub username: String,
+    pub password: String,
+    pub favorite: bool,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct IdSite {
+    pub id: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SiteAccount {
     pub id: String,
     pub site: String,
@@ -90,12 +103,6 @@ pub enum Accounts {
     Error(AcctCodes),
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub enum SiteAccountAction {
-    Put,
-    Delete,
-}
-
 #[allow(dead_code)]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum AcctCodes {
@@ -106,4 +113,5 @@ pub enum AcctCodes {
     AccountAdded,
     AccountDeleted,
     NoSuchUser,
+    AccountNotFound,
 }

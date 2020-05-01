@@ -23,6 +23,7 @@ impl AppServer {
                 routes![
                     hello,
                     controller::get_accounts,
+                    controller::add_account,
                     controller::modify_account,
                     controller::delete_account,
                 ],
