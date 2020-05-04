@@ -188,7 +188,13 @@ All information to and from the backend will be given in JSON format. I suggest 
    - Response will be: 
    ```
    HTTP/1.1 201 Created
+   Content-Type: application/json
+   Content-Length: <body-length>
    <any other fields>
+   
+   {
+       "id": "<site_id>"
+   }
    ```
    
 7. Modify Account Information

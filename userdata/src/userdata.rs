@@ -79,6 +79,12 @@ pub struct AddSite {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum ReturnIdSite {
+    Id(IdSite),
+    Error(AcctCodes),
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct IdSite {
     pub id: String,
 }

@@ -2,7 +2,9 @@ use dataprovider::data_structs::{DatabaseAccountEntry, DatabaseSiteAccount, User
 use dataprovider::primary_data_provider::{create_acct_user, get_accounts_list, update_accounts};
 use jwt::claim::Claim;
 use std::env;
-use userdata::userdata::{Accounts, AccountsList, AcctCodes, AddSite, IdSite, SiteAccount};
+use userdata::userdata::{
+    Accounts, AccountsList, AcctCodes, AddSite, IdSite, ReturnIdSite, SiteAccount,
+};
 
 #[derive(Debug)]
 enum EntryType {
@@ -88,12 +90,12 @@ pub(crate) fn get_accounts(claim: Claim) -> Accounts {
     Accounts::Accounts(AccountsList { accounts })
 }
 
-pub(crate) fn add_account(claim: Claim, site: AddSite) -> AcctCodes {
+pub(crate) fn add_account(claim: Claim, site: AddSite) -> ReturnIdSite {
     println!("Site to add is: {:?}", site);
 
     let mut db_entry = match get_db_entry(&claim) {
         DbEntry::Entry(en) => en,
-        DbEntry::Error(code) => return code,
+        DbEntry::Error(code) => return ReturnIdSite::Error(code),
     };
     println!("db found: {:?}", db_entry);
 
@@ -112,12 +114,12 @@ pub(crate) fn add_account(claim: Claim, site: AddSite) -> AcctCodes {
         Ok(id) => id,
         Err(e) => {
             println!("Error: {:?}", e);
-            return AcctCodes::InternalError;
+            return ReturnIdSite::Error(AcctCodes::InternalError);
         }
     };
 
     entries.push(DatabaseSiteAccount {
-        id,
+        id: id.clone(),
         site: site.site,
         username: site.username,
         password: site.password,
@@ -126,9 +128,10 @@ pub(crate) fn add_account(claim: Claim, site: AddSite) -> AcctCodes {
 
     if let Err(e) = update_accounts(db_entry) {
         println!("Error: {:?}", e);
-        return AcctCodes::DatabaseError;
+        return ReturnIdSite::Error(AcctCodes::DatabaseError);
     }
-    AcctCodes::AccountAdded
+    // AcctCodes::AccountAdded
+    ReturnIdSite::Id(IdSite { id: id.to_hex() })
 }
 
 pub(crate) fn modify_account(claim: Claim, site: SiteAccount) -> AcctCodes {

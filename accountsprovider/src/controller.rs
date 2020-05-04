@@ -3,7 +3,9 @@ use jwt::apikey::ApiKey;
 use jwt::claim::get_claim;
 use rocket::http::Status;
 use rocket_contrib::json::Json;
-use userdata::userdata::{Accounts, AccountsList, AcctCodes, AddSite, IdSite, SiteAccount};
+use userdata::userdata::{
+    Accounts, AccountsList, AcctCodes, AddSite, IdSite, ReturnIdSite, SiteAccount,
+};
 
 #[get("/accounts")]
 pub fn get_accounts(key: ApiKey) -> Result<Json<AccountsList>, Status> {
@@ -18,13 +20,25 @@ pub fn get_accounts(key: ApiKey) -> Result<Json<AccountsList>, Status> {
 }
 
 #[put("/addaccount", data = "<site>")]
-pub fn add_account(key: ApiKey, site: Json<AddSite>) -> Status {
+pub fn add_account(
+    key: ApiKey,
+    site: Json<AddSite>,
+) -> Result<rocket::response::status::Created<Json<IdSite>>, Status> {
     let claim = match get_claim(key.key.as_str()) {
         Some(data) => data,
-        None => return Status::InternalServerError,
+        None => return Err(Status::InternalServerError),
     };
 
-    handle_code(accountsprovider::add_account(claim, site.0))
+    match accountsprovider::add_account(claim, site.0) {
+        ReturnIdSite::Id(id) => {
+            // Status::Created
+            Ok(rocket::response::status::Created(
+                "/getaccounts".to_string(),
+                Some(Json(id)),
+            ))
+        }
+        ReturnIdSite::Error(code) => Err(handle_code(code)),
+    }
 }
 
 #[put("/modifyaccount", data = "<site>")]
