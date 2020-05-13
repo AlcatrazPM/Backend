@@ -101,7 +101,8 @@ All information to and from the backend will be given in JSON format. I suggest 
     {
         "username": "genericuser@emailclient.com",
         "old_password": "notarealpasswordjustthehash",
-        "new_password": "newpasswordhash"
+        "new_password": "newpasswordhash",
+        "new_dek": "NewSuchSecurity"
     }
            
     ```

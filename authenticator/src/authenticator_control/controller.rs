@@ -32,7 +32,11 @@ pub fn modify_password(credentials: Json<ChangePassword>, key: ApiKey) -> Status
         format!("Your modified password data is: {:?}", credentials)
     );
     println!("{}", format!("Your api key is: {:?}", key));
-    handle_code(authenticator::modify_password(credentials.0))
+    let claim = match get_claim(key.key.as_str()) {
+        Some(data) => data,
+        None => return Status::InternalServerError,
+    };
+    handle_code(authenticator::modify_password(credentials.0, claim))
 }
 
 #[post("/modifyacctdata", data = "<data>")]

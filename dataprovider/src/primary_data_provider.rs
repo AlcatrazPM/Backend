@@ -3,7 +3,7 @@ use mongodb::Error;
 use crate::data_structs::{DatabaseAccountEntry, DatabaseUser, UserId};
 use crate::utils;
 use crate::utils::{build_db_acct, DB};
-use userdata::userdata::{AuthCodes, ParsedChangeAcctData, UserCredentials};
+use userdata::userdata::{AuthCodes, ChangePassword, ParsedChangeAcctData, UserCredentials};
 
 pub fn get_user(id: UserId) -> Result<Option<DatabaseUser>, Error> {
     let coll = utils::connect(DB::Auth)?;
@@ -52,15 +52,16 @@ pub fn insert_user(user: UserCredentials) -> Result<bool, Error> {
     Ok(true)
 }
 
-pub fn change_password(user: UserCredentials, new_password: String) -> Result<AuthCodes, Error> {
-    let mut user = match get_user(UserId::Email(user.email)) {
-        Ok(Some(u)) => u,
-        Ok(None) => return Ok(AuthCodes::UnregisteredUser),
-        Err(e) => return Err(e),
-    };
+pub fn change_password(mut user: DatabaseUser, data: ChangePassword) -> Result<AuthCodes, Error> {
+    // let mut user = match get_user(UserId::Email(data.user)) {
+    //     Ok(Some(u)) => u,
+    //     Ok(None) => return Ok(AuthCodes::UnregisteredUser),
+    //     Err(e) => return Err(e),
+    // };
     let filter = doc! { "email" => user.email.clone() };
 
-    user.credential = new_password;
+    user.credential = data.new_password;
+    user.e_dek = data.new_dek;
 
     match utils::update_user(user, filter) {
         Ok(_) => Ok(AuthCodes::ChangedPassword),

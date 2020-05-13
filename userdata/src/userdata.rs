@@ -40,6 +40,7 @@ pub struct ChangePassword {
     pub user: String,
     pub old_password: String,
     pub new_password: String,
+    pub new_dek: String,
 }
 
 #[derive(Debug, Deserialize)]

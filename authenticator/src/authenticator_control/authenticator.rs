@@ -42,17 +42,19 @@ pub fn login(user: LoginCredentials) -> Login {
 }
 
 #[allow(dead_code)]
-pub fn modify_password(data: ChangePassword) -> AuthCodes {
+pub fn modify_password(data: ChangePassword, claim: Claim) -> AuthCodes {
     // unimplemented!()
     // AuthCodes::ChangedPassword
-    let user: UserCredentials = UserCredentials {
-        email: data.user,
-        name: "".to_string(),
-        password: data.old_password,
-        e_dek: "".to_string(),
-        i_kek: "".to_string(),
+    let db_user = match get_user(UserId::Email(data.user.clone())) {
+        Ok(Some(user)) if user.credential == data.old_password && user.id.to_hex() == claim.usr => {
+            user
+        }
+        Ok(Some(_)) => return AuthCodes::BadPassword,
+        Ok(None) => return AuthCodes::UnregisteredUser,
+        Err(_) => return AuthCodes::DatabaseError,
     };
-    match change_password(user, data.new_password) {
+
+    match change_password(db_user, data) {
         Ok(code) => code,
         Err(e) => {
             println!("Error at modified pass: {:?}", e);
