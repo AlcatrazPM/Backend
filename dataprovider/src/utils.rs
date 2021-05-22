@@ -12,7 +12,7 @@ use userdata::userdata::UserCredentials;
 static AUTH_DB: &str = "localhost:27017";
 static ACCT_DB: &str = "localhost:27018";
 
-pub(crate) fn parse_db_env_var(env: &str) -> (String, u16) {
+pub(crate) fn parse_db_env_var(env: &str) -> (String, u16, String, String) {
     let db = match env::var(env) {
         Ok(val) => val,
         Err(_) => {
@@ -31,25 +31,41 @@ pub(crate) fn parse_db_env_var(env: &str) -> (String, u16) {
         Some(val) => *val,
         None => {
             println!("Setting to default listening connection for MongoDB");
-            return ("localhost".to_string(), 27017);
+            return ("localhost".to_string(), 27017, "dorel".to_string(), "doreldorel".to_string());
         }
     };
     let port = match db.get(1) {
         Some(val) => (*val),
         None => {
             println!("Setting to default listening connection for MongoDB");
-            return ("localhost".to_string(), 27017);
+            return ("localhost".to_string(), 27017, "dorel".to_string(), "doreldorel".to_string());
+
         }
     };
     let port = match u16::from_str(port) {
         Ok(val) => val,
         Err(_) => {
             println!("Setting to default listening connection for MongoDB");
-            return ("localhost".to_string(), 27017);
+            return ("localhost".to_string(), 27017, "dorel".to_string(), "doreldorel".to_string());
+
+        }
+    };
+    let user = match env::var("MONGO_USER") {
+        Ok(val) => val,
+        Err(_) => {
+            println!("Setting to default listening connection for MongoDB");
+            "dorel".to_string()
+        }
+    };
+    let pass = match env::var("MONGO_PASS") {
+        Ok(val) => val,
+        Err(_) => {
+            println!("Setting to default listening connection for MongoDB");
+            "doreldorel".to_string()
         }
     };
 
-    (String::from(host), port)
+    (String::from(host), port, user, pass)
 }
 
 pub(crate) fn connect(db: DB) -> Result<Collection, Error> {
@@ -57,10 +73,11 @@ pub(crate) fn connect(db: DB) -> Result<Collection, Error> {
         DB::Auth => "AUTH_DB",
         DB::Acct => "ACCT_DB",
     };
-    let (host, port): (String, u16) = parse_db_env_var(db_type);
-    println!("DB is {}:{}", host, port);
+    let (host, port, user, pass): (String, u16, String, String) = parse_db_env_var(db_type);
 
     let client = Client::connect(host.as_str(), port)?;
+    let dbb = client.db("admin");
+    let auth = dbb.auth(&user, &pass);
 
     let coll_name: &str = match db {
         DB::Auth => "users",
